@@ -23,7 +23,7 @@ const Sidebar = () => {
 
   // Measure dropdown heights (5 billing items, 5 expense items)
   const measureHeights = useCallback(() => {
-    setBillingHeight(220); // 5 items × ~30px = 150px
+    setBillingHeight(220); // 5 items × ~30px = 150px + padding
     setExpenseHeight(160); // 5 items
   }, []);
 
@@ -43,19 +43,21 @@ const Sidebar = () => {
   // Base link style
   const baseLinkStyle = {
     textDecoration: 'none',
-    padding: '8px 12px',
-    borderRadius: '6px',
+    padding: '8px 16px',
+    borderRadius: '8px',
     display: 'block',
     transition: 'all 0.2s ease',
-    fontSize: '14px'
+    fontSize: '14px',
+    color: '#6B7280',
+    fontWeight: '500'
   };
 
   const getLinkStyle = (path) => {
     if (isActive(path)) {
       return {
         ...baseLinkStyle,
-        color: '#5C40FF',
-        backgroundColor: 'rgba(92, 64, 255, 0.15)',
+        color: '#6C47FF',
+        backgroundColor: 'rgba(108, 71, 255, 0.1)',
         fontWeight: '600'
       };
     }
@@ -81,7 +83,7 @@ const Sidebar = () => {
     justifyContent: 'space-between',
     alignItems: 'center',
     transition: 'background-color 0.2s',
-    backgroundColor: isOpen ? 'rgba(92, 64, 255, 0.06)' : 'transparent'
+    backgroundColor: isOpen ? 'rgba(108, 71, 255, 0.06)' : 'transparent'
   });
 
   // Style for top-level nav items like Dashboard & Accounting
@@ -93,8 +95,8 @@ const Sidebar = () => {
     borderRadius: '8px',
     fontWeight: '600',
     fontSize: '15px',
-    color: isActive(path) ? '#5C40FF' : '#374151',
-    backgroundColor: isActive(path) ? 'rgba(92, 64, 255, 0.1)' : 'transparent',
+    color: isActive(path) ? '#6C47FF' : '#374151',
+    backgroundColor: isActive(path) ? 'rgba(108, 71, 255, 0.1)' : 'transparent',
     textDecoration: 'none',
     transition: 'background-color 0.2s ease'
   });
@@ -111,25 +113,45 @@ const Sidebar = () => {
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
         zIndex: 100,
-        overflowY: 'auto'
+        overflowY: 'auto',
+        borderRight: '1px solid #E5E7EB'
       }}
     >
-      {/* Logo */}
+      {/* Logo / Header */}
       <div
         style={{
-          fontSize: '22px',
-          fontWeight: '800',
-          marginBottom: '32px',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
-          color: '#111827'
+          gap: '12px',
+          padding: '16px',
+          borderRadius: '12px',
+          backgroundColor: '#F9FAFB',
+          marginBottom: '24px',
+          border: '1px solid #E5E7EB'
         }}
       >
-        <span style={{ color: '#5C40FF', fontSize: '24px' }}>📊</span>
-        <span style={{ letterSpacing: '-0.5px' }}>MonitorBiz</span>
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: '#6C47FF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            color: '#FFFFFF'
+          }}
+        >
+          👤
+        </div>
+        <div>
+          <div style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280' }}>Product Designer</div>
+          <div style={{ fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Andrew Smith</div>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -139,7 +161,7 @@ const Sidebar = () => {
           to="/dashboard"
           style={topLevelStyle('/dashboard')}
         >
-          <span>🏠</span>
+          <span style={{ color: '#6C47FF', fontSize: '18px' }}>📊</span>
           <span>Dashboard</span>
         </Link>
 
@@ -151,10 +173,10 @@ const Sidebar = () => {
             aria-expanded={openBilling}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span>💰</span>
+              <span style={{ color: '#6C47FF', fontSize: '18px' }}>💰</span>
               <span>Billing</span>
             </div>
-            <span style={{ transition: 'transform 0.25s', transform: openBilling ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+            <span style={{ transition: 'transform 0.25s', transform: openBilling ? 'rotate(180deg)' : 'rotate(0deg)', color: '#6C47FF' }}>▼</span>
           </button>
 
           <div
@@ -166,7 +188,7 @@ const Sidebar = () => {
               marginTop: openBilling ? '8px' : '0'
             }}
           >
-            <div style={{ paddingLeft: '28px', display: 'flex', flexDirection: 'column', gap: '6px', }}>
+            <div style={{ paddingLeft: '28px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <Link to="/dashboard/billing/customer" style={getLinkStyle('/dashboard/billing/customer')}>Customer Info</Link>
               <Link to="/dashboard/billing/quote" style={getLinkStyle('/dashboard/billing/quote')}>Quote</Link>
               <Link to="/dashboard/billing/invoice" style={getLinkStyle('/dashboard/billing/invoice')}>Invoice</Link>
@@ -184,10 +206,10 @@ const Sidebar = () => {
             aria-expanded={openExpense}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span>📉</span>
+              <span style={{ color: '#6C47FF', fontSize: '18px' }}>📉</span>
               <span>Expense Tracking</span>
             </div>
-            <span style={{ transition: 'transform 0.25s', transform: openExpense ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+            <span style={{ transition: 'transform 0.25s', transform: openExpense ? 'rotate(180deg)' : 'rotate(0deg)', color: '#6C47FF' }}>▼</span>
           </button>
 
           <div
@@ -214,20 +236,64 @@ const Sidebar = () => {
           to="/dashboard/accounting"
           style={topLevelStyle('/dashboard/accounting')}
         >
-          <span>📊</span>
+          <span style={{ color: '#6C47FF', fontSize: '18px' }}>📈</span>
           <span>Accounting</span>
         </Link>
       </nav>
 
-      {/* Logout */}
+      {/* Messages Section */}
+      <div style={{ marginTop: '24px', borderTop: '1px solid #E5E7EB', paddingTop: '16px' }}>
+        <div style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280', marginBottom: '12px' }}>
+          MESSAGES
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {['Erik Gunsel', 'Emily Smith', 'Arthur Adeik'].map((name, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s',
+                color: '#6B7280',
+                fontSize: '14px'
+              }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = '#F9FAFB')}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+            >
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  backgroundColor: '#6C47FF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  color: '#FFFFFF'
+                }}
+              >
+                {name.charAt(0)}
+              </div>
+              <span>{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Add New Task Button */}
       <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
         <button
-          onClick={handleLogout}
           style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: '#FEF2F2',
-            color: '#DC2626',
+            backgroundColor: '#FF9234',
+            color: '#FFFFFF',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
@@ -240,11 +306,11 @@ const Sidebar = () => {
             transition: 'background-color 0.2s',
             outline: 'none'
           }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = '#FEE2E2')}
-          onMouseOut={(e) => (e.target.style.backgroundColor = '#FEF2F2')}
+          onMouseOver={(e) => (e.target.style.backgroundColor = '#FF7F1F')}
+          onMouseOut={(e) => (e.target.style.backgroundColor = '#FF9234')}
         >
-          <span>🚪</span>
-          <span>Logout</span>
+          <span>➕</span>
+          <span>Add New Task</span>
         </button>
       </div>
     </aside>

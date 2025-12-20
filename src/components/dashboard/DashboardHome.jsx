@@ -74,12 +74,12 @@ const DashboardHome = () => {
   const expenseBarData = [
     { name: 'Employee', amount: parseFloat(expenseData.employee.expense.replace('$', '')) },
     { name: 'Company Client', amount: parseFloat(expenseData.companyClient.amount.replace('$', '')) },
-    { name: 'Credit', amount: parseFloat(expenseData.credit.amount.replace('$', '').replace('-', '')) },
+    { name: 'Credit', amount: Math.abs(parseFloat(expenseData.credit.amount.replace('$', '').replace('-', ''))) },
     { name: 'Misc.', amount: parseFloat(expenseData.miscellaneous.amount.replace('$', '')) },
     { name: 'Dynamic', amount: parseFloat(expenseData.dynamic.amount.replace('$', '')) }
   ];
 
-  const COLORS = ['#5C40FF', '#8B6DFF', '#C7B8FF', '#A78BFA', '#D8B4FE'];
+  const COLORS = ['#6C47FF', '#8B6DFF', '#A78BFA', '#C4B5FD', '#DDD6FE'];
 
   // === ANIMATED ICON COMPONENT ===
   const AnimatedIcon = ({ children, delay = 0 }) => (
@@ -94,7 +94,7 @@ const DashboardHome = () => {
   );
 
   // === ANIMATED CARD COMPONENT ===
-  const SectionCard = ({ title, icon, children, bgColor = '#FFF', borderColor = '#E5E7EB', delay = 0 }) => {
+  const SectionCard = ({ title, icon, children, bgColor = '#FFFFFF', borderColor = '#E5E7EB', delay = 0 }) => {
     const controls = useAnimation();
     const ref = React.useRef(null);
     const isInView = useInView(ref, { once: true, margin: '-100px' });
@@ -119,7 +119,7 @@ const DashboardHome = () => {
           border: `1px solid ${borderColor}`,
           borderRadius: '16px',
           padding: '24px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
           transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
           display: 'flex',
           flexDirection: 'column',
@@ -127,7 +127,7 @@ const DashboardHome = () => {
         }}
         whileHover={{
           y: -6,
-          boxShadow: '0 10px 25px rgba(92, 64, 255, 0.12)'
+          boxShadow: '0 8px 30px rgba(108, 71, 255, 0.1)'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -137,7 +137,7 @@ const DashboardHome = () => {
           >
             <AnimatedIcon delay={delay}><span style={{ fontSize: '22px' }}>{icon}</span></AnimatedIcon>
           </motion.div>
-          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#111827' }}>{title}</h3>
+          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#1F2937' }}>{title}</h3>
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {children}
@@ -154,7 +154,7 @@ const DashboardHome = () => {
         initial={{ opacity: 0.7 }}
         whileHover={{ opacity: 1, x: highlight ? 4 : 0 }}
         style={{
-          color: highlight ? '#5C40FF' : '#111827',
+          color: highlight ? '#6C47FF' : '#1F2937',
           fontWeight: highlight ? '700' : '500',
           textAlign: 'right'
         }}
@@ -167,6 +167,8 @@ const DashboardHome = () => {
   // === CHART TOOLTIP CUSTOMIZATION ===
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const value = payload[0].value;
+      const isCredit = label === 'Credit';
       return (
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -175,13 +177,20 @@ const DashboardHome = () => {
             backgroundColor: '#fff',
             padding: '12px',
             border: '1px solid #E5E7EB',
-            borderRadius: '10px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            fontSize: '13px'
+            borderRadius: '12px',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+            fontSize: '13px',
+            minWidth: '100px'
           }}
         >
-          <p style={{ margin: 0, fontWeight: '600', color: '#111827' }}>{label}</p>
-          <p style={{ margin: 0, color: '#5C40FF' }}>${payload[0].value.toFixed(2)}</p>
+          <p style={{ margin: 0, fontWeight: '600', color: '#1F2937' }}>{label}</p>
+          <p style={{
+            margin: 0,
+            color: isCredit ? '#EF4444' : '#6C47FF',
+            fontWeight: '700'
+          }}>
+            {isCredit ? `-$${Math.abs(value).toFixed(2)}` : `$${value.toFixed(2)}`}
+          </p>
         </motion.div>
       );
     }
@@ -191,19 +200,17 @@ const DashboardHome = () => {
   return (
     <div style={{
       padding: '32px',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#F9FAFB',
       minHeight: '100vh',
-      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      color: '#111827'
+      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      color: '#1F2937'
     }}>
       {/* === HEADER === */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        style={{
-          marginBottom: '32px'
-        }}
+        style={{ marginBottom: '32px' }}
       >
         <div style={{
           display: 'flex',
@@ -211,12 +218,14 @@ const DashboardHome = () => {
           gap: '12px',
           marginBottom: '8px'
         }}>
-          <AnimatedIcon delay={0}><span style={{ fontSize: '28px', color: '#5C40FF' }}>📊</span></AnimatedIcon>
+          <AnimatedIcon delay={0}>
+            <span style={{ fontSize: '28px', color: '#6C47FF' }}>📊</span>
+          </AnimatedIcon>
           <h1 style={{
             fontSize: '28px',
             fontWeight: '800',
             margin: 0,
-            background: 'linear-gradient(90deg, #5C40FF, #8B6DFF)',
+            background: 'linear-gradient(90deg, #6C47FF, #8B6DFF)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
           }}>
@@ -228,7 +237,7 @@ const DashboardHome = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
           style={{
-            color: '#64748b',
+            color: '#6B7280',
             fontSize: '16px',
             fontWeight: '500'
           }}
@@ -248,7 +257,7 @@ const DashboardHome = () => {
         {/* === BILLING CARD === */}
         <SectionCard title="Billing" icon="💰" delay={0.1}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.15}>📋</AnimatedIcon> Customer Info
             </div>
             <DataItem label="Company" value={billingData.customer.company} />
@@ -256,27 +265,27 @@ const DashboardHome = () => {
             <DataItem label="Address" value={billingData.customer.address} />
             <DataItem label="Phone" value={billingData.customer.phone} />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.2}>🔖</AnimatedIcon> Quote
             </div>
             <DataItem label="Commodity" value={billingData.quote.commodity} />
             <DataItem label="Pricing" value={billingData.quote.pricing} />
             <DataItem label="Grand Total" value={billingData.quote.grandTotal} highlight />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.25}>🧾</AnimatedIcon> Invoice
             </div>
             <DataItem label="Grand Total" value={billingData.invoice.grandTotal} />
             <DataItem label="Tax Payment" value={billingData.invoice.taxPayment} />
             <DataItem label="Total" value={billingData.invoice.total} highlight />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.3}>✅</AnimatedIcon> Payment Receipt
             </div>
             <DataItem label="Receipt #" value={billingData.payment.receipt} />
@@ -291,10 +300,12 @@ const DashboardHome = () => {
                     data={billingPieData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={3}
+                    innerRadius={45}
+                    outerRadius={75}
+                    paddingAngle={2}
                     dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
                   >
                     {billingPieData.map((entry, index) => (
                       <Cell
@@ -314,39 +325,39 @@ const DashboardHome = () => {
         {/* === EXPENSE TRACKING CARD === */}
         <SectionCard title="Expense Tracking" icon="📉" delay={0.2}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.25}>👤</AnimatedIcon> Employee Expense
             </div>
             <DataItem label="Employee" value={expenseData.employee.name} />
             <DataItem label="Expense" value={expenseData.employee.expense} highlight />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.3}>🏢</AnimatedIcon> Company Client
             </div>
             <DataItem label="Client" value={expenseData.companyClient.client} />
             <DataItem label="Amount" value={expenseData.companyClient.amount} highlight />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.35}>🔄</AnimatedIcon> Credit
             </div>
             <DataItem label="Description" value={expenseData.credit.description} />
             <DataItem label="Amount" value={expenseData.credit.amount} highlight />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.4}>🛒</AnimatedIcon> Miscellaneous
             </div>
             <DataItem label="Description" value={expenseData.miscellaneous.description} />
             <DataItem label="Amount" value={expenseData.miscellaneous.amount} />
 
-            <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '12px 0' }} />
+            <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
 
-            <div style={{ fontWeight: '700', color: '#374151', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <AnimatedIcon delay={0.45}>⚡</AnimatedIcon> Dynamic
             </div>
             <DataItem label="Description" value={expenseData.dynamic.description} />
@@ -356,9 +367,19 @@ const DashboardHome = () => {
             <div style={{ height: '220px', marginTop: '16px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={expenseBarData}>
-                  <CartesianGrid strokeDasharray="4 4" stroke="#f1f5f9" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#64748b' }} />
-                  <YAxis tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <CartesianGrid strokeDasharray="4 4" stroke="#E5E7EB" vertical={false} />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#6B7280' }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12, fill: '#6B7280' }}
+                    tickFormatter={(value) => `$${value}`}
+                  />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
                     {expenseBarData.map((entry, index) => (
@@ -372,15 +393,15 @@ const DashboardHome = () => {
         </SectionCard>
 
         {/* === ACCOUNTING CARD === */}
-        <SectionCard title="Accounting" icon="📊" bgColor="#fafafa" borderColor="#e2e8f0" delay={0.3}>
+        <SectionCard title="Accounting" icon="📊" bgColor="#FAFBFF" borderColor="#E0E7FF" delay={0.3}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px', textAlign: 'center' }}>
             <motion.div
-              animate={{ rotate: [0, 5, 0, -5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              animate={{ rotate: [0, 3, 0, -3, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <span style={{ fontSize: '48px', opacity: 0.3 }}>🧮</span>
+              <span style={{ fontSize: '48px', opacity: 0.4, color: '#6C47FF' }}>🧮</span>
             </motion.div>
-            <p style={{ color: '#64748b', fontSize: '15px', lineHeight: 1.5, maxWidth: '280px' }}>
+            <p style={{ color: '#6B7280', fontSize: '15px', lineHeight: 1.5, maxWidth: '280px' }}>
               Your financial overview, balance sheets, and reports will appear here.
             </p>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
@@ -391,16 +412,17 @@ const DashboardHome = () => {
                   alignItems: 'center',
                   gap: '8px',
                   padding: '10px 20px',
-                  backgroundColor: '#5C40FF',
+                  backgroundColor: '#6C47FF',
                   color: '#FFFFFF',
                   borderRadius: '10px',
                   textDecoration: 'none',
                   fontSize: '14px',
                   fontWeight: '600',
-                  transition: 'background 0.3s ease'
+                  transition: 'background 0.3s ease',
+                  boxShadow: '0 2px 8px rgba(108, 71, 255, 0.3)'
                 }}
-                onMouseEnter={(e) => e.target.style.background = '#4C32CC'}
-                onMouseLeave={(e) => e.target.style.background = '#5C40FF'}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = '#5C3CDD')}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = '#6C47FF')}
               >
                 <AnimatedIcon>➡️</AnimatedIcon>
                 Go to Accounting
@@ -418,15 +440,15 @@ const DashboardHome = () => {
         transition={{ delay: 0.5 }}
         style={{
           paddingTop: '24px',
-          borderTop: '1px solid #e2e8f0',
+          borderTop: '1px solid #E0E7FF',
           textAlign: 'center',
-          color: '#64748b',
+          color: '#6B7280',
           fontSize: '14px'
         }}
       >
         <p>
           Need help? Contact support or explore our{' '}
-          <Link to="#" style={{ color: '#5C40FF', fontWeight: '600', textDecoration: 'none' }}>
+          <Link to="#" style={{ color: '#6C47FF', fontWeight: '600', textDecoration: 'none' }}>
             documentation
           </Link>.
         </p>
