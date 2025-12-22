@@ -60,7 +60,7 @@ const Quote = () => {
   const taxAmount = (subtotal * gstRate) / 100;
   const grandTotal = subtotal + taxAmount;
 
-  // ✅ Generate Attractive PDF
+  // ✅ Generate PDF with Brand Colors
   const handleGeneratePDF = (e) => {
     e.preventDefault();
 
@@ -71,15 +71,14 @@ const Quote = () => {
 
     const doc = new jsPDF();
 
-    // === PAGE LAYOUT ===
     const pageWidth = 210; // A4 width in mm
     const margin = 15;
     const contentWidth = pageWidth - 2 * margin;
 
     // === HEADER ===
-    // Logo placeholder (text-based)
+    // Logo: Use dark gray (or orange if it's a logo mark — here, text is fine in dark)
     doc.setFontSize(22);
-    doc.setTextColor(92, 64, 255); // #5C40FF
+    doc.setTextColor(31, 41, 55); // #1F2937
     doc.text('MonitorBiz', margin, 25);
 
     doc.setFontSize(10);
@@ -88,13 +87,12 @@ const Quote = () => {
 
     // Title
     doc.setFontSize(24);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(31, 41, 55);
     doc.setFont(undefined, 'bold');
     doc.text('QUOTATION', pageWidth / 2, 25, { align: 'center' });
 
     // Quote info
     doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
     doc.setTextColor(107, 114, 128);
     doc.text(`Quote #: Q-${Math.floor(Math.random() * 10000)}`, pageWidth - margin, 25, { align: 'right' });
     doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, pageWidth - margin, 31, { align: 'right' });
@@ -105,12 +103,12 @@ const Quote = () => {
 
     // From
     doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(31, 41, 55);
     doc.setFont(undefined, 'bold');
     doc.text('From', margin, startY);
 
     doc.setFont(undefined, 'normal');
-    doc.setTextColor(75, 85, 99); // #4B5563
+    doc.setTextColor(75, 85, 99);
     const fromLines = [
       'MonitorBiz',
       '123 Tech Park, Goa',
@@ -123,11 +121,9 @@ const Quote = () => {
 
     // To
     doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
     doc.text('Bill To', margin + colWidth + 10, startY);
 
     doc.setFont(undefined, 'normal');
-    doc.setTextColor(75, 85, 99);
     const toLines = [
       customer.name || '—',
       ...(customer.address ? customer.address.split('\n') : ['—']),
@@ -146,7 +142,7 @@ const Quote = () => {
     doc.rect(margin, tableTop, contentWidth, 8, 'F');
 
     doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(31, 41, 55);
     doc.setFontSize(10);
     doc.text('Description', margin + 2, tableTop + 5);
     doc.text('Qty', margin + colWidth - 15, tableTop + 5, { align: 'center' });
@@ -162,7 +158,6 @@ const Quote = () => {
         currentY = 20;
       }
 
-      // Zebra striping
       if (index % 2 === 0) {
         doc.setFillColor(253, 254, 254); // #FDFEFE
         doc.rect(margin, currentY - 4, contentWidth, 8, 'F');
@@ -196,17 +191,16 @@ const Quote = () => {
     doc.setDrawColor(229, 231, 235); // #E5E7EB
     doc.line(totalBoxLeft, totalStartY + 12, totalBoxRight, totalStartY + 12);
 
-    // Grand Total
+    // ✅ Grand Total in ORANGE (key data)
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.setTextColor(92, 64, 255); // #5C40FF
+    doc.setTextColor(255, 107, 0); // #FF6B00
     doc.text('GRAND TOTAL', totalBoxLeft, totalStartY + 18);
     doc.text(`₹ ${grandTotal.toFixed(2)}`, totalBoxRight, totalStartY + 18, { align: 'right' });
 
     // === FOOTER ===
     const footerY = totalStartY + 32;
     doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
     doc.setTextColor(107, 114, 128);
     doc.text('Thank you for your business! This quotation is valid for 15 days.', margin, footerY);
 
@@ -216,94 +210,81 @@ const Quote = () => {
   };
 
   return (
-    <div style={{ padding: '24px', fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif', color: '#374151' }}>
+    <div style={{
+      padding: '24px',
+      fontFamily: '"Inter", -apple-system, Segoe UI, Roboto, sans-serif',
+      color: '#1F2937',
+      backgroundColor: '#FFFFFF',
+      minHeight: '100vh'
+    }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1F2937', margin: '0' }}>Create New Quote</h1>
+        <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1F2937', margin: '0' }}>
+          Create New Quote
+        </h1>
         <p style={{ fontSize: '16px', color: '#6B7280', marginTop: '8px' }}>
           Fill customer details, add items, and generate a professional quotation.
         </p>
       </div>
 
-      <div style={{ backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', padding: '36px' }}>
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '16px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        border: '1px solid #E5E7EB',
+        padding: '36px'
+      }}>
         <form onSubmit={handleGeneratePDF}>
           {/* Customer Section */}
           <section style={{ marginBottom: '36px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1F2937', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #f0f0f0' }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1F2937',
+              marginBottom: '20px',
+              paddingBottom: '10px',
+              borderBottom: '1px solid #E5E7EB'
+            }}>
               Client Information
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Client Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={customer.name}
-                  onChange={handleCustomerChange}
-                  placeholder="ABC Enterprises"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: '10px',
-                    fontSize: '15px',
-                    color: '#374151',
-                    backgroundColor: '#FAFAFA',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#C7D2FE'}
-                  onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={customer.email}
-                  onChange={handleCustomerChange}
-                  placeholder="contact@abc.com"
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: '10px',
-                    fontSize: '15px',
-                    color: '#374151',
-                    backgroundColor: '#FAFAFA',
-                    outline: 'none'
-                  }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={customer.phone}
-                  onChange={handleCustomerChange}
-                  placeholder="+91 98765 43210"
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    border: '1px solid #E5E7EB',
-                    borderRadius: '10px',
-                    fontSize: '15px',
-                    color: '#374151',
-                    backgroundColor: '#FAFAFA',
-                    outline: 'none'
-                  }}
-                />
-              </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '24px'
+            }}>
+              {[
+                { label: 'Client Name *', name: 'name', type: 'text', placeholder: 'ABC Enterprises', required: true },
+                { label: 'Email', name: 'email', type: 'email', placeholder: 'contact@abc.com' },
+                { label: 'Phone', name: 'phone', type: 'tel', placeholder: '+91 98765 43210' }
+              ].map((field) => (
+                <div key={field.name}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
+                    {field.label}
+                  </label>
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={customer[field.name]}
+                    onChange={handleCustomerChange}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '10px',
+                      fontSize: '15px',
+                      color: '#1F2937',
+                      backgroundColor: '#FFFFFF',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#FF6B00'}
+                    onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
+                  />
+                </div>
+              ))}
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
                   Address
                 </label>
                 <textarea
@@ -318,11 +299,13 @@ const Quote = () => {
                     border: '1px solid #E5E7EB',
                     borderRadius: '10px',
                     fontSize: '15px',
-                    color: '#374151',
-                    backgroundColor: '#FAFAFA',
+                    color: '#1F2937',
+                    backgroundColor: '#FFFFFF',
                     outline: 'none',
                     resize: 'vertical'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = '#FF6B00'}
+                  onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
                 />
               </div>
             </div>
@@ -331,27 +314,42 @@ const Quote = () => {
           {/* Items Section */}
           <section style={{ marginBottom: '36px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1F2937', paddingBottom: '10px', borderBottom: '2px solid #f0f0f0' }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: '#1F2937',
+                paddingBottom: '10px',
+                borderBottom: '1px solid #E5E7EB'
+              }}>
                 Items
               </h2>
               <button
                 type="button"
                 onClick={addCommodity}
                 style={{
-                  padding: '8px 20px',
-                  backgroundColor: '#EEF2FF',
-                  color: '#4F46E5',
-                  border: '1px solid #C7D2FE',
-                  borderRadius: '10px',
+                  padding: '8px 16px',
+                  backgroundColor: 'transparent',
+                  color: '#6B7280',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  transition: 'background 0.2s'
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
                 }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#E0E7FF'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#EEF2FF'}
+                onMouseOver={(e) => {
+                  e.target.style.borderColor = '#D1D5DB';
+                  e.target.style.color = '#4B5563';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.borderColor = '#E5E7EB';
+                  e.target.style.color = '#6B7280';
+                }}
               >
-                + Add Item
+                <span>+</span> Add Item
               </button>
             </div>
 
@@ -359,17 +357,17 @@ const Quote = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '650px' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#F9FAFB' }}>
-                    <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '700', color: '#374151' }}>Description</th>
-                    <th style={{ padding: '14px 16px', textAlign: 'center', fontSize: '14px', fontWeight: '700', color: '#374151' }}>Qty</th>
-                    <th style={{ padding: '14px 16px', textAlign: 'right', fontSize: '14px', fontWeight: '700', color: '#374151' }}>Rate Rs</th>
-                    <th style={{ padding: '14px 16px', textAlign: 'right', fontSize: '14px', fontWeight: '700', color: '#374151' }}>Amount Rs</th>
+                    <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Description</th>
+                    <th style={{ padding: '14px 16px', textAlign: 'center', fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Qty</th>
+                    <th style={{ padding: '14px 16px', textAlign: 'right', fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Rate ₹</th>
+                    <th style={{ padding: '14px 16px', textAlign: 'right', fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Amount ₹</th>
                     <th style={{ padding: '14px 16px', width: '50px' }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {commodities.map((item) => (
                     <tr key={item.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                      <td style={{ padding: '16px', fontSize: '15px', color: '#374151' }}>
+                      <td style={{ padding: '16px' }}>
                         <input
                           type="text"
                           value={item.name}
@@ -380,11 +378,12 @@ const Quote = () => {
                             padding: '8px 10px',
                             border: '1px solid #E5E7EB',
                             borderRadius: '8px',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            color: '#1F2937'
                           }}
                         />
                       </td>
-                      <td style={{ padding: '16px', fontSize: '15px', color: '#374151', textAlign: 'center' }}>
+                      <td style={{ padding: '16px', textAlign: 'center' }}>
                         <input
                           type="number"
                           min="1"
@@ -396,11 +395,12 @@ const Quote = () => {
                             border: '1px solid #E5E7EB',
                             borderRadius: '8px',
                             fontSize: '14px',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            color: '#1F2937'
                           }}
                         />
                       </td>
-                      <td style={{ padding: '16px', fontSize: '15px', color: '#374151', textAlign: 'right' }}>
+                      <td style={{ padding: '16px', textAlign: 'right' }}>
                         <input
                           type="number"
                           min="0"
@@ -413,12 +413,13 @@ const Quote = () => {
                             border: '1px solid #E5E7EB',
                             borderRadius: '8px',
                             fontSize: '14px',
-                            textAlign: 'right'
+                            textAlign: 'right',
+                            color: '#1F2937'
                           }}
                         />
                       </td>
-                      <td style={{ padding: '16px', fontSize: '15px', fontWeight: '600', color: '#1F2937', textAlign: 'right' }}>
-                        Rs {parseFloat(item.amount).toFixed(2)}
+                      <td style={{ padding: '16px', fontWeight: '600', color: '#1F2937', textAlign: 'right' }}>
+                        ₹ {parseFloat(item.amount).toFixed(2)}
                       </td>
                       <td style={{ padding: '16px', textAlign: 'center' }}>
                         <button
@@ -446,17 +447,24 @@ const Quote = () => {
 
           {/* Totals */}
           <section>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#1F2937', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #f0f0f0' }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1F2937',
+              marginBottom: '20px',
+              paddingBottom: '10px',
+              borderBottom: '1px solid #E5E7EB'
+            }}>
               Summary
             </h2>
             <div style={{ display: 'flex', justifyContent: 'flex-end', maxWidth: '320px', marginLeft: 'auto' }}>
-              <div style={{ width: '100%', backgroundColor: '#FAFAFA', borderRadius: '12px', padding: '20px' }}>
+              <div style={{ width: '100%', backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '20px', border: '1px solid #E5E7EB' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '15px', color: '#4B5563' }}>Subtotal</span>
+                  <span style={{ fontSize: '15px', color: '#6B7280' }}>Subtotal</span>
                   <span style={{ fontSize: '15px', fontWeight: '600', color: '#1F2937' }}>₹ {subtotal.toFixed(2)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '15px', color: '#4B5563' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '15px', color: '#6B7280' }}>
                     GST (
                     <input
                       type="number"
@@ -472,17 +480,19 @@ const Quote = () => {
                         textAlign: 'right',
                         border: '1px solid #D1D5DB',
                         borderRadius: '6px',
-                        backgroundColor: 'white'
+                        backgroundColor: '#FFFFFF',
+                        color: '#1F2937'
                       }}
                     />
                     %)
                   </span>
                   <span style={{ fontSize: '15px', fontWeight: '600', color: '#1F2937' }}>₹ {taxAmount.toFixed(2)}</span>
                 </div>
-                <div style={{ borderTop: '2px solid #E5E7EB', paddingTop: '12px', marginTop: '12px' }}>
+                <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '12px', marginTop: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '18px', fontWeight: '700', color: '#1F2937' }}>Total</span>
-                    <span style={{ fontSize: '20px', fontWeight: '800', color: '#5C40FF' }}>₹ {grandTotal.toFixed(2)}</span>
+                    {/* ✅ Key data → use brand orange */}
+                    <span style={{ fontSize: '20px', fontWeight: '800', color: '#FF6B00' }}>₹ {grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -499,14 +509,14 @@ const Quote = () => {
                 fontSize: '16px',
                 borderRadius: '12px',
                 border: '1px solid #D1D5DB',
-                backgroundColor: 'white',
-                color: '#374151',
+                backgroundColor: '#FFFFFF',
+                color: '#1F2937',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s'
+                transition: 'background 0.2s'
               }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#F9FAFB'}
-              onMouseOut={(e) => e.target.style.backgroundColor = 'white'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#FFFFFF'}
             >
               Cancel
             </button>
@@ -517,14 +527,14 @@ const Quote = () => {
                 fontSize: '16px',
                 borderRadius: '12px',
                 border: 'none',
-                backgroundColor: '#5C40FF',
-                color: 'white',
+                backgroundColor: '#FF6B00', // ✅ Primary brand color
+                color: '#FFFFFF',
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'background 0.2s'
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#4A32E0'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#5C40FF'}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#E05A00'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#FF6B00'}
             >
               Generate Quote
             </button>

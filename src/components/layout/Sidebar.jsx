@@ -1,6 +1,6 @@
 // src/components/layout/Sidebar.jsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const [openBilling, setOpenBilling] = useState(false);
@@ -11,9 +11,9 @@ const Sidebar = () => {
 
   // Auto-expand sections based on active route
   useEffect(() => {
-    if (location.pathname.startsWith('/dashboard/billing')) {
+    if (location.pathname.startsWith("/dashboard/billing")) {
       setOpenBilling(true);
-    } else if (location.pathname.startsWith('/dashboard/expense')) {
+    } else if (location.pathname.startsWith("/dashboard/expense")) {
       setOpenExpense(true);
     } else {
       setOpenBilling(false);
@@ -21,147 +21,176 @@ const Sidebar = () => {
     }
   }, [location.pathname]);
 
-  // Measure dropdown heights (5 billing items, 5 expense items)
   const measureHeights = useCallback(() => {
-    setBillingHeight(220); // 5 items × ~30px = 150px + padding
-    setExpenseHeight(160); // 5 items
+    setBillingHeight(230); // Adjusted for visual spacing
+    setExpenseHeight(180);
   }, []);
 
   useEffect(() => {
     measureHeights();
-    window.addEventListener('resize', measureHeights);
-    return () => window.removeEventListener('resize', measureHeights);
+    window.addEventListener("resize", measureHeights);
+    return () => window.removeEventListener("resize", measureHeights);
   }, [measureHeights]);
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    window.location.href = '/login';
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "/login";
   };
 
   const isActive = (path) => location.pathname === path;
 
   // Base link style
   const baseLinkStyle = {
-    textDecoration: 'none',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    display: 'block',
-    transition: 'all 0.2s ease',
-    fontSize: '14px',
-    color: '#6B7280',
-    fontWeight: '500'
+    textDecoration: "none",
+    padding: "10px 16px",
+    borderRadius: "8px",
+    display: "block",
+    transition: "all 0.25s ease",
+    fontSize: "14px",
+    color: "#9CA3AF", // Light gray for inactive
+    fontWeight: "500",
   };
 
   const getLinkStyle = (path) => {
     if (isActive(path)) {
       return {
         ...baseLinkStyle,
-        color: '#6C47FF',
-        backgroundColor: 'rgba(108, 71, 255, 0.1)',
-        fontWeight: '600'
+        color: "#FF6B00",
+        backgroundColor: "rgba(255, 107, 0, 0.1)",
+        fontWeight: "600",
       };
     }
-    return {
-      ...baseLinkStyle,
-      color: '#6B7280',
-      fontWeight: '500'
-    };
+    return baseLinkStyle;
   };
 
   const sectionButtonStyle = (isOpen) => ({
-    background: 'transparent',
-    border: 'none',
-    color: '#1F2937',
-    textAlign: 'left',
-    width: '100%',
-    padding: '12px 16px',
-    fontSize: '15px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    borderRadius: '8px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    transition: 'background-color 0.2s',
-    backgroundColor: isOpen ? 'rgba(108, 71, 255, 0.06)' : 'transparent'
+    background: "transparent",
+    border: "none",
+    color: "#E5E7EB",
+    textAlign: "left",
+    width: "100%",
+    padding: "12px 16px",
+    fontSize: "15px",
+    fontWeight: "600",
+    cursor: "pointer",
+    borderRadius: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    transition: "background-color 0.25s",
+    backgroundColor: isOpen ? "rgba(255, 107, 0, 0.1)" : "transparent",
   });
 
-  // Style for top-level nav items like Dashboard & Accounting
   const topLevelStyle = (path) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontWeight: '600',
-    fontSize: '15px',
-    color: isActive(path) ? '#6C47FF' : '#374151',
-    backgroundColor: isActive(path) ? 'rgba(108, 71, 255, 0.1)' : 'transparent',
-    textDecoration: 'none',
-    transition: 'background-color 0.2s ease'
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "12px 16px",
+    borderRadius: "8px",
+    fontWeight: "600",
+    fontSize: "15px",
+    color: isActive(path) ? "#FF6B00" : "#E5E7EB",
+    backgroundColor: isActive(path) ? "rgba(255, 107, 0, 0.1)" : "transparent",
+    textDecoration: "none",
+    transition: "background-color 0.25s ease",
   });
 
   return (
     <aside
       style={{
-        width: '260px',
-        backgroundColor: '#FFFFFF',
-        height: '100vh',
-        position: 'fixed',
-        padding: '24px 16px',
-        boxSizing: 'border-box',
-        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
+        width: "260px",
+        backgroundColor: "#0F0F0F", // Near black
+        height: "100vh",
+        position: "fixed",
+        padding: "24px 16px",
+        boxSizing: "border-box",
+        fontFamily:
+          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
         zIndex: 100,
-        overflowY: 'auto',
-        borderRight: '1px solid #E5E7EB'
+        overflowY: "auto",
+        borderRight: "1px solid #2D2D2D",
       }}
     >
+      {/* Animated Icon Styles */}
+      <style>
+        {`
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+          }
+          .icon-hover {
+            display: inline-block;
+            transition: transform 0.3s ease, color 0.3s ease;
+          }
+          .icon-hover:hover {
+            animation: bounce 0.5s ease;
+            color: #FF6B00 !important;
+          }
+          .rotate {
+            transition: transform 0.25s ease;
+          }
+        `}
+      </style>
+
       {/* Logo / Header */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '16px',
-          borderRadius: '12px',
-          backgroundColor: '#F9FAFB',
-          marginBottom: '24px',
-          border: '1px solid #E5E7EB'
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "16px",
+          borderRadius: "12px",
+          backgroundColor: "#1A1A1A",
+          marginBottom: "24px",
+          border: "1px solid #2D2D2D",
         }}
       >
         <div
           style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: '#6C47FF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#FFFFFF'
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            backgroundColor: "#FF6B00",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "16px",
+            fontWeight: "bold",
+            color: "#000000",
           }}
         >
-          👤
+          W
         </div>
         <div>
-          <div style={{ fontSize: '12px', fontWeight: '500', color: '#6B7280' }}>Product Designer</div>
-          <div style={{ fontSize: '14px', fontWeight: '700', color: '#1F2937' }}>Andrew Smith</div>
+          <div style={{ fontSize: "12px", fontWeight: "500", color: "#6B7280" }}>
+            Web Developer
+          </div>
+          <div style={{ fontSize: "14px", fontWeight: "700", color: "#FFFFFF" }}>
+            Vishwakarma Smith
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <nav
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+        }}
+      >
         {/* Dashboard Button */}
-        <Link
-          to="/dashboard"
-          style={topLevelStyle('/dashboard')}
-        >
-          <span style={{ color: '#6C47FF', fontSize: '18px' }}>📊</span>
+        <Link to="/dashboard" style={topLevelStyle("/dashboard")}>
+          <span
+            className="icon-hover"
+            style={{ fontSize: "18px", color: isActive("/dashboard") ? "#FF6B00" : "#A1A1AA" }}
+          >
+            📊
+          </span>
           <span>Dashboard</span>
         </Link>
 
@@ -172,28 +201,62 @@ const Sidebar = () => {
             style={sectionButtonStyle(openBilling)}
             aria-expanded={openBilling}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ color: '#6C47FF', fontSize: '18px' }}>💰</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                className="icon-hover"
+                style={{ fontSize: "18px", color: openBilling ? "#FF6B00" : "#A1A1AA" }}
+              >
+                💰
+              </span>
               <span>Billing</span>
             </div>
-            <span style={{ transition: 'transform 0.25s', transform: openBilling ? 'rotate(180deg)' : 'rotate(0deg)', color: '#6C47FF' }}>▼</span>
+            <span
+              className="rotate"
+              style={{
+                transform: openBilling ? "rotate(180deg)" : "rotate(0deg)",
+                color: "#FF6B00",
+                transition: "transform 0.25s ease",
+              }}
+            >
+              ▼
+            </span>
           </button>
 
           <div
             style={{
-              height: openBilling ? `${billingHeight}px` : '0px',
+              height: openBilling ? `${billingHeight}px` : "0px",
               opacity: openBilling ? 1 : 0,
-              overflow: 'hidden',
-              transition: 'height 0.3s ease, opacity 0.2s ease',
-              marginTop: openBilling ? '8px' : '0'
+              overflow: "hidden",
+              transition: "height 0.3s ease, opacity 0.2s ease",
+              marginTop: openBilling ? "8px" : "0",
+              
             }}
           >
-            <div style={{ paddingLeft: '28px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Link to="/dashboard/billing/customer" style={getLinkStyle('/dashboard/billing/customer')}>Customer Info</Link>
-              <Link to="/dashboard/billing/quote" style={getLinkStyle('/dashboard/billing/quote')}>Quote</Link>
-              <Link to="/dashboard/billing/invoice" style={getLinkStyle('/dashboard/billing/invoice')}>Invoice</Link>
-              <Link to="/dashboard/billing/payment" style={getLinkStyle('/dashboard/billing/payment')}>Payment</Link>
-              <Link to="/dashboard/billing/items" style={getLinkStyle('/dashboard/billing/items')}>Items</Link>
+            <div
+              style={{
+                paddingLeft: "28px",
+                display: "flex",
+                flexDirection: "column",
+              gap: "6px",
+                
+              }}
+            >
+              {[
+                { to: "/dashboard/billing/customer", label: "Customer Info" },
+                { to: "/dashboard/billing/quote", label: "Quote" },
+                { to: "/dashboard/billing/invoice", label: "Invoice" },
+                { to: "/dashboard/billing/payment", label: "Payment" },
+                { to: "/dashboard/billing/items", label: "Items" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  style={getLinkStyle(item.to)}
+                  className="icon-hover"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -205,28 +268,60 @@ const Sidebar = () => {
             style={sectionButtonStyle(openExpense)}
             aria-expanded={openExpense}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ color: '#6C47FF', fontSize: '18px' }}>📉</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                className="icon-hover"
+                style={{ fontSize: "18px", color: openExpense ? "#FF6B00" : "#A1A1AA" }}
+              >
+                📉
+              </span>
               <span>Expense Tracking</span>
             </div>
-            <span style={{ transition: 'transform 0.25s', transform: openExpense ? 'rotate(180deg)' : 'rotate(0deg)', color: '#6C47FF' }}>▼</span>
+            <span
+              className="rotate"
+              style={{
+                transform: openExpense ? "rotate(180deg)" : "rotate(0deg)",
+                color: "#FF6B00",
+                transition: "transform 0.25s ease",
+              }}
+            >
+              ▼
+            </span>
           </button>
 
           <div
             style={{
-              height: openExpense ? `${expenseHeight}px` : '0px',
+              height: openExpense ? `${expenseHeight}px` : "0px",
               opacity: openExpense ? 1 : 0,
-              overflow: 'hidden',
-              transition: 'height 0.3s ease, opacity 0.2s ease',
-              marginTop: openExpense ? '8px' : '0'
+              overflow: "hidden",
+              transition: "height 0.3s ease, opacity 0.2s ease",
+              marginTop: openExpense ? "8px" : "0",
             }}
           >
-            <div style={{ paddingLeft: '28px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Link to="/dashboard/expense/employee" style={getLinkStyle('/dashboard/expense/employee')}>Employee Expense</Link>
-              <Link to="/dashboard/expense/company" style={getLinkStyle('/dashboard/expense/company')}>Company Client</Link>
-              <Link to="/dashboard/expense/credit" style={getLinkStyle('/dashboard/expense/credit')}>Credit</Link>
-              <Link to="/dashboard/expense/miscellaneous" style={getLinkStyle('/dashboard/expense/miscellaneous')}>Miscellaneous</Link>
-              <Link to="/dashboard/expense/dynamic" style={getLinkStyle('/dashboard/expense/dynamic')}>Dynamic</Link>
+            <div
+              style={{
+                paddingLeft: "28px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              {[
+                { to: "/dashboard/expense/employee", label: "Employee Expense" },
+                { to: "/dashboard/expense/company", label: "Company Client" },
+                { to: "/dashboard/expense/credit", label: "Credit" },
+                { to: "/dashboard/expense/miscellaneous", label: "Miscellaneous" },
+                { to: "/dashboard/expense/dynamic", label: "Dynamic" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  style={getLinkStyle(item.to)}
+                  className="icon-hover"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -234,85 +329,44 @@ const Sidebar = () => {
         {/* Accounting */}
         <Link
           to="/dashboard/accounting"
-          style={topLevelStyle('/dashboard/accounting')}
+          style={topLevelStyle("/dashboard/accounting")}
         >
-          <span style={{ color: '#6C47FF', fontSize: '18px' }}>📈</span>
+          <span
+            className="icon-hover"
+            style={{ fontSize: "18px", color: isActive("/dashboard/accounting") ? "#FF6B00" : "#A1A1AA" }}
+          >
+            📈
+          </span>
           <span>Accounting</span>
         </Link>
       </nav>
 
-      {/* Messages Section */}
-      <div style={{ marginTop: '24px', borderTop: '1px solid #E5E7EB', paddingTop: '16px' }}>
-        <div style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280', marginBottom: '12px' }}>
-          MESSAGES
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {['Erik Gunsel', 'Emily Smith', 'Arthur Adeik'].map((name, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'background-color 0.2s',
-                color: '#6B7280',
-                fontSize: '14px'
-              }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = '#F9FAFB')}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
-            >
-              <div
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  backgroundColor: '#6C47FF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
-                  color: '#FFFFFF'
-                }}
-              >
-                {name.charAt(0)}
-              </div>
-              <span>{name}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Add New Task Button */}
-      <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
-        <button
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: '#FF9234',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '15px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            transition: 'background-color 0.2s',
-            outline: 'none'
-          }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = '#FF7F1F')}
-          onMouseOut={(e) => (e.target.style.backgroundColor = '#FF9234')}
-        >
-          <span>➕</span>
-          <span>Add New Task</span>
-        </button>
-      </div>
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        style={{
+          marginTop: "auto",
+          padding: "12px 16px",
+          borderRadius: "8px",
+          backgroundColor: "#FF6B00",
+          color: "#000000",
+          fontWeight: "700",
+          fontSize: "14px",
+          border: "none",
+          cursor: "pointer",
+          transition: "background-color 0.25s, transform 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = "#FF8C33";
+          e.target.style.transform = "scale(1.02)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = "#FF6B00";
+          e.target.style.transform = "scale(1)";
+        }}
+      >
+        Logout
+      </button>
     </aside>
   );
 };
