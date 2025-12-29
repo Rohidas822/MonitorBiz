@@ -240,11 +240,11 @@ const Sidebar = () => {
               }}
             >
               {[
-                { to: "/dashboard/sales-billing/customers", label: "Customers" },
-                { to: "/dashboard/sales-billing/commodity", label: "Commodity" },
-                { to: "/dashboard/sales-billing/quotations", label: "Quotations" },
-                { to: "/dashboard/sales-billing/invoices", label: "Invoices" },
-                { to: "/dashboard/sales-billing/expenses", label: "Expenses" },
+                { to: "billing/customer", label: "Customers" },
+                { to: "billing/commodity", label: "Commodity" },
+                { to: "billing/quote", label: "Quotations" },
+                { to: "billing/invoice", label: "Invoices" },
+                { to: "billing/expenses", label: "Expenses" },
               ].map((item) => (
                 <Link
                   key={item.to}

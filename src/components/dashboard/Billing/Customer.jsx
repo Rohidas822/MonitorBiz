@@ -1,461 +1,353 @@
 // src/components/dashboard/Billing/Customer.jsx
-import React, { useState } from 'react';
-import { FaInfoCircle, FaCopy, FaPlus } from 'react-icons/fa';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaHome, FaSearch, FaUser, FaEnvelope, FaChevronDown, FaUsers, FaCheckCircle, FaFileAlt, FaBuilding, FaEye, FaEdit, FaPlus, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-const INDIAN_STATES = [
-  "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa",
-  "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",
-  "Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland",
-  "Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telanganda","Tripura",
-  "Uttar Pradesh","Uttarakhand","West Bengal","Delhi",
-  "Jammu and Kashmir","Ladakh","Puducherry"
-];
-
-const COUNTRIES = [
-  "India", "United States", "Canada", "United Kingdom", "Australia", "Germany", "France", "Japan", "China", "Brazil"
-];
-
-const LANGUAGES = ["English", "Hindi", "Marathi"];
-
-const initialFormState = {
-  companyName: '',
-  gstNumber: '',
-  billingAddress: '',
-  billingCity: '',
-  billingState: '',
-  billingPincode: '',
-  shippingAddress: '',
-  shippingCity: '',
-  shippingState: '',
-  shippingPincode: '',
-  phone: '',
-  email: '',
-  contactPerson: '',
-  workPhone: '',
-  mobilePhone: '',
-  customerLanguage: 'English',
-  billingAttention: '',
-  billingCountry: 'India',
-  billingStreet1: '',
-  billingStreet2: '',
-  shippingAttention: '',
-  shippingCountry: 'India',
-  shippingStreet1: '',
-  shippingStreet2: ''
-};
-
 const Customer = () => {
-  const [formData, setFormData] = useState(initialFormState);
-  const [activeTab, setActiveTab] = useState('address');
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Customer data submitted:', formData);
-    alert('Customer details saved successfully!');
-  };
-
-  const handleReset = () => {
-    setFormData(initialFormState);
-  };
-
-  const copyBillingToShipping = () => {
-    setFormData(prev => ({
-      ...prev,
-      shippingAttention: prev.billingAttention,
-      shippingCountry: prev.billingCountry,
-      shippingStreet1: prev.billingStreet1,
-      shippingStreet2: prev.billingStreet2,
-      shippingCity: prev.billingCity,
-      shippingState: prev.billingState,
-      shippingPincode: prev.billingPincode
-    }));
-  };
-
-  // ✅ Info Icon: Use black color
-  const InfoIcon = ({ tooltip }) => (
-    <motion.span
-      whileHover={{ scale: 1.2, rotate: 15 }}
-      whileTap={{ scale: 0.9 }}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        marginLeft: '6px',
-        color: '#000000', // Black
-        cursor: 'help'
-      }}
-      title={tooltip}
-    >
-      <FaInfoCircle />
-    </motion.span>
-  );
-
-  // ✅ Copy Button: Use black border, orange hover
-  const CopyIcon = ({ onClick, tooltip }) => (
-    <motion.button
-      whileHover={{ scale: 1.1, borderColor: '#FF6B00' }}
-      whileTap={{ scale: 0.95 }}
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        background: 'transparent',
-        border: '1px solid #000000',
-        borderRadius: '6px',
-        color: '#000000',
-        cursor: 'pointer',
-        fontSize: '14px',
-        fontWeight: '500',
-        padding: '6px 10px',
-        transition: 'all 0.2s ease'
-      }}
-      title={tooltip}
-    >
-      <FaCopy size={14} />
-      {tooltip}
-    </motion.button>
-  );
+  const sampleCustomerId = "213"; // Static sample row ID (will be dynamic later)
 
   return (
     <div style={{
-      padding: '24px',
       fontFamily: '"Inter", -apple-system, Segoe UI, Roboto, sans-serif',
-      color: '#000000', // Black text
-      backgroundColor: '#FFFFFF', // White background
-      minHeight: '100vh'
+      backgroundColor: '#F9FAFB',
+      minHeight: '100vh',
+      padding: '20px'
     }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#000000', margin: 0 }}>
-          Customer Information
-        </h1>
-        <p style={{ fontSize: '16px', color: '#333333', marginTop: '8px' }}>
-          Manage billing/shipping details, GST, and contact information
-        </p>
+
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        paddingBottom: '16px',
+        borderBottom: '1px solid #E5E7EB'
+      }}>
+        <h1 style={{ fontSize: '20px', fontWeight: '600', color: '#000000' }}>Customers</h1>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div style={{ position: 'relative', width: '280px' }}>
+            <FaSearch style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#6B7280'
+            }} />
+            <input
+              type="text"
+              placeholder="Search..."
+              style={{
+                width: '100%',
+                padding: '8px 12px 8px 36px',
+                borderRadius: '8px',
+                border: '1px solid #D1D5DB',
+                fontSize: '14px',
+                color: '#1F2937',
+                outline: 'none'
+              }}
+            />
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            border: '1px solid #E5E7EB',
+            backgroundColor: '#FFFFFF'
+          }}>
+            <span style={{ fontSize: '14px', color: '#1F2937' }}>Rohidas Raghu Lakade</span>
+            <FaChevronDown size={12} color="#6B7280" />
+          </div>
+        </div>
       </div>
 
+      {/* Main Content Card */}
       <div style={{
         backgroundColor: '#FFFFFF',
-        borderRadius: '16px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)', // Subtle black shadow
-        border: '1px solid #000000',
-        padding: '32px',
-        maxWidth: '1200px',
-        margin: '0 auto'
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        padding: '24px',
+        marginBottom: '24px'
       }}>
-        {/* Top Form Fields */}
+
+        {/* Title + Total + New Button */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <div>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#000000', margin: 0 }}>Customers</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+              <FaHome color="#6B7280" size={14} />
+              <span style={{ fontSize: '14px', color: '#6B7280' }}>Home &gt; Customers</span>
+            </div>
+            <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '4px' }}>
+              Manage your customer relationships and contacts
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              backgroundColor: '#F3F4F6',
+              fontSize: '14px',
+              color: '#1F2937'
+            }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#10B981'
+              }}></div>
+              1 Total
+            </div>
+
+            {/* New Customer Navigation */}
+            <button
+              onClick={() => navigate("/dashboard/billing/customer/create")}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: '#FF6B00',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}>
+              <FaPlus size={14} />
+              New Customer
+            </button>
+          </div>
+        </div>
+
+        {/* Metric Cards */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px',
-          marginBottom: '32px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '16px',
+          marginBottom: '24px'
         }}>
-          <div>
-            <label style={labelStyle}>
-              Company Name *<InfoIcon tooltip="Registered business name" />
-            </label>
-            <input name="companyName" required value={formData.companyName} onChange={handleChange} style={inputStyle} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>
-              Contact Person<InfoIcon tooltip="Primary contact for communications" />
-            </label>
-            <input name="contactPerson" value={formData.contactPerson} onChange={handleChange} style={inputStyle} />
-          </div>
-
-          <div>
-            <label style={labelStyle}>
-              Email Address<InfoIcon tooltip="Business email address" />
-            </label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} style={inputStyle} />
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>
-                Work Phone<InfoIcon tooltip="Office/work contact number" />
-              </label>
-              <input name="workPhone" value={formData.workPhone} onChange={handleChange} style={inputStyle} />
+          {[
+            { title: 'Total Customers', value: '1', icon: <FaUsers color="#3B82F6" />, linkText: 'All contacts', linkColor: '#3B82F6' },
+            { title: 'Active Customers', value: '1', icon: <FaCheckCircle color="#10B981" />, linkText: 'Currently active', linkColor: '#10B981' },
+            { title: 'With GST', value: '0', icon: <FaFileAlt color="#8B5CF6" />, linkText: 'GST registered', linkColor: '#8B5CF6' },
+            { title: 'Business Type', value: '1', icon: <FaBuilding color="#F59E0B" />, linkText: 'B2B customers', linkColor: '#F59E0B' }
+          ].map((card, index) => (
+            <div key={index} style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '10px',
+              border: '1px solid #E5E7EB',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%'
+            }}>
+              <div>
+                <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '8px' }}>{card.title}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '24px', fontWeight: '700', color: '#000000' }}>{card.value}</span>
+                  {card.icon}
+                </div>
+              </div>
+              <div style={{ marginTop: '12px' }}>
+                <span style={{
+                  fontSize: '12px',
+                  color: card.linkColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer'
+                }}>
+                  {card.linkText}
+                </span>
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>
-                Mobile<InfoIcon tooltip="Mobile contact number" />
-              </label>
-              <input name="mobilePhone" value={formData.mobilePhone} onChange={handleChange} style={inputStyle} />
-            </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>
-              Customer Language<InfoIcon tooltip="Preferred language for communication" />
-            </label>
-            <select name="customerLanguage" value={formData.customerLanguage} onChange={handleChange} style={inputStyle}>
-              {LANGUAGES.map(lang => (
-                <option key={lang} value={lang}>{lang}</option>
-              ))}
-            </select>
-          </div>
+          ))}
         </div>
 
-        {/* Tabs */}
+        {/* Customer Directory Table */}
         <div style={{
-          borderBottom: '1px solid #000000',
-          marginBottom: '24px',
-          paddingBottom: '12px'
+          backgroundColor: '#FFFFFF',
+          borderRadius: '10px',
+          border: '1px solid #E5E7EB',
+          overflow: 'hidden'
         }}>
-          <div style={{ display: 'flex', gap: '24px' }}>
-            {['Other Details', 'Address', 'Contact Persons', 'Custom Fields', 'Remarks'].map(tab => {
-              const tabId = tab.toLowerCase().replace(/\s+/g, '-');
-              const isActive = activeTab === tabId;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tabId)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: isActive ? '600' : '400',
-                    color: isActive ? '#FF6B00' : '#000000', // Orange when active, black otherwise
-                    borderBottom: isActive ? '2px solid #FF6B00' : 'none',
-                    cursor: 'pointer',
-                    transition: 'color 0.2s'
-                  }}
-                >
-                  {tab}
-                </button>
-              );
-            })}
+
+          {/* Table Header */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 20px',
+            borderBottom: '1px solid #E5E7EB',
+            backgroundColor: '#F9FAFB'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#000000', margin: 0 }}>Customer Directory</h3>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <div style={{ cursor: 'pointer', fontSize: '14px', color: '#6B7280' }}>
+                <FaUser size={14} className="me-1"/> All customers
+              </div>
+              <div style={{ cursor: 'pointer', fontSize: '14px', color: '#6B7280' }}>
+                <FaChevronDown size={12} className="me-1"/> A-Z
+              </div>
+            </div>
+          </div>
+
+          {/* Table Body */}
+          <div style={{ padding: '16px 20px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', color: '#1F2937' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                  {['CUSTOMER', 'CONTACT INFO', 'LOCATION', 'BUSINESS', 'STATUS', 'ACTIONS'].map((header) => (
+                    <th key={header} style={{
+                      textAlign: 'left',
+                      padding: '12px 16px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#6B7280',
+                      textTransform: 'uppercase'
+                    }}>
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                  <td style={{ padding: '16px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: '#F3F4F6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: '#FF6B00'
+                      }}>
+                        Sa
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: '600', color: '#000000' }}>Sample Client</div>
+                        <div style={{ fontSize: '12px', color: '#6B7280' }}>ID: {sampleCustomerId}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td style={{ padding: '16px 16px' }}>
+                    <FaPhone size={12} className="me-1 text-secondary"/> 9876543210 <br/>
+                    <FaEnvelope size={12} className="me-1 text-secondary"/> client@example.com
+                  </td>
+
+                  <td style={{ padding: '16px 16px' }}>
+                    <FaMapMarkerAlt size={12} className="me-1 text-secondary"/> Mumbai <br/>
+                    <span style={{ fontSize: '12px', color: '#6B7280' }}>Maharashtra</span>
+                  </td>
+
+                  <td style={{ padding: '16px 16px' }}>
+                    <FaBuilding size={12} className="me-1 text-secondary"/> Business <br/>
+                    <div style={{
+                      fontSize: '12px',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      backgroundColor: '#F3F4F6',
+                      display: 'inline-block',
+                      color: '#6B7280'
+                    }}>
+                      No GST
+                    </div>
+                  </td>
+
+                  <td style={{ padding: '16px 16px' }}>
+                    <div style={{
+                      padding: '4px 12px',
+                      borderRadius: '16px',
+                      backgroundColor: '#ECFDF5',
+                      color: '#059669',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      display: 'inline-block'
+                    }}>
+                      Active
+                    </div>
+                  </td>
+
+                  <td style={{ padding: '16px 16px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {/* View Navigation */}
+                      <button
+                        onClick={() => navigate(`/dashboard/billing/customer/view/${sampleCustomerId}`)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #E5E7EB',
+                          backgroundColor: '#FFFFFF',
+                          color: '#6B7280',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                        <FaEye size={14} />
+                        View
+                      </button>
+
+                      {/* Edit Navigation */}
+                      <button
+                        onClick={() => navigate(`/dashboard/billing/customer/edit/${sampleCustomerId}`)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #E5E7EB',
+                          backgroundColor: '#FFFFFF',
+                          color: '#6B7280',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                        <FaEdit size={14} />
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* Address Section */}
-        {activeTab === 'address' && (
-          <form onSubmit={handleSubmit}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '24px'
-            }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#000000' }}>Billing Address</h2>
-              <CopyIcon onClick={copyBillingToShipping} tooltip="Copy to shipping" />
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '24px',
-              marginBottom: '32px'
-            }}>
-              <div>
-                <label style={labelStyle}>
-                  Attention<InfoIcon tooltip="Recipient name for billing" />
-                </label>
-                <input name="billingAttention" value={formData.billingAttention} onChange={handleChange} style={inputStyle} />
-              </div>
-
-              <div>
-                <label style={labelStyle}>Country/Region</label>
-                <select name="billingCountry" value={formData.billingCountry} onChange={handleChange} style={inputStyle}>
-                  {COUNTRIES.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Address</label>
-                <textarea
-                  name="billingStreet1"
-                  rows="1"
-                  placeholder="Street 1"
-                  value={formData.billingStreet1}
-                  onChange={handleChange}
-                  style={{ ...inputStyle, marginBottom: '8px' }}
-                />
-                <textarea
-                  name="billingStreet2"
-                  rows="1"
-                  placeholder="Street 2"
-                  value={formData.billingStreet2}
-                  onChange={handleChange}
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={labelStyle}>City</label>
-                <input name="billingCity" value={formData.billingCity} onChange={handleChange} style={inputStyle} />
-              </div>
-
-              <div>
-                <label style={labelStyle}>State</label>
-                <select name="billingState" value={formData.billingState} onChange={handleChange} style={inputStyle}>
-                  <option value="">Select State</option>
-                  {INDIAN_STATES.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={labelStyle}>PIN Code</label>
-                <input name="billingPincode" value={formData.billingPincode} onChange={handleChange} style={inputStyle} />
-              </div>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '24px'
-            }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#000000' }}>Shipping Address</h2>
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '24px',
-              marginBottom: '32px'
-            }}>
-              <div>
-                <label style={labelStyle}>
-                  Attention<InfoIcon tooltip="Recipient name for shipping" />
-                </label>
-                <input name="shippingAttention" value={formData.shippingAttention} onChange={handleChange} style={inputStyle} />
-              </div>
-
-              <div>
-                <label style={labelStyle}>Country/Region</label>
-                <select name="shippingCountry" value={formData.shippingCountry} onChange={handleChange} style={inputStyle}>
-                  {COUNTRIES.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Address</label>
-                <textarea
-                  name="shippingStreet1"
-                  rows="1"
-                  placeholder="Street 1"
-                  value={formData.shippingStreet1}
-                  onChange={handleChange}
-                  style={{ ...inputStyle, marginBottom: '8px' }}
-                />
-                <textarea
-                  name="shippingStreet2"
-                  rows="1"
-                  placeholder="Street 2"
-                  value={formData.shippingStreet2}
-                  onChange={handleChange}
-                  style={inputStyle}
-                />
-              </div>
-
-              <div>
-                <label style={labelStyle}>City</label>
-                <input name="shippingCity" value={formData.shippingCity} onChange={handleChange} style={inputStyle} />
-              </div>
-
-              <div>
-                <label style={labelStyle}>State</label>
-                <select name="shippingState" value={formData.shippingState} onChange={handleChange} style={inputStyle}>
-                  <option value="">Select State</option>
-                  {INDIAN_STATES.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={labelStyle}>PIN Code</label>
-                <input name="shippingPincode" value={formData.shippingPincode} onChange={handleChange} style={inputStyle} />
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-              <button type="button" onClick={handleReset} style={resetBtnStyle}>
-                Reset
-              </button>
-              <button type="submit" style={saveBtnStyle}>
-                Save Customer
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Other Tab Content Placeholder */}
-        {activeTab !== 'address' && (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px',
-            color: '#333333',
-            fontSize: '18px'
-          }}>
-            {activeTab === 'other-details' && 'Other Details content will appear here.'}
-            {activeTab === 'contact-persons' && 'Contact Persons content will appear here.'}
-            {activeTab === 'custom-fields' && 'Custom Fields content will appear here.'}
-            {activeTab === 'remarks' && 'Remarks content will appear here.'}
-          </div>
-        )}
       </div>
+
     </div>
   );
-};
-
-// ✅ Updated Styles Using Orange & Black Palette
-const labelStyle = { 
-  fontSize: '14px', 
-  fontWeight: '600', 
-  marginBottom: '8px', 
-  display: 'block',
-  color: '#000000'
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '12px 16px',
-  border: '1px solid #000000', // Black border
-  borderRadius: '10px',
-  backgroundColor: '#FFFFFF', // Clean white background
-  fontSize: '16px',
-  color: '#000000',
-  transition: 'border-color 0.2s',
-  outline: 'none'
-};
-
-const resetBtnStyle = {
-  padding: '10px 24px',
-  backgroundColor: '#FFFFFF',
-  color: '#000000',
-  borderRadius: '10px',
-  border: '1px solid #000000',
-  fontWeight: '500',
-  cursor: 'pointer',
-  transition: 'all 0.2s ease'
-};
-
-const saveBtnStyle = {
-  padding: '10px 28px',
-  backgroundColor: '#FF6B00', // Primary orange
-  color: '#FFFFFF',
-  borderRadius: '10px',
-  border: 'none',
-  fontWeight: '600',
-  cursor: 'pointer',
-  transition: 'background-color 0.2s ease'
 };
 
 export default Customer;

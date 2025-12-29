@@ -8,15 +8,12 @@ import DashboardHome from './components/dashboard/DashboardHome';
 import Customer from './components/dashboard/Billing/Customer';
 import Invoice from './components/dashboard/Billing/Invoice';
 import Quote from './components/dashboard/Billing/Quote';
-import Payment from './components/dashboard/Billing/Payment';
-import EmployeeExpense from './components/dashboard/ExpenseTracking/Employee';
-import CompanyClient from './components/dashboard/ExpenseTracking/Company';
-import Credit from './components/dashboard/ExpenseTracking/Credit';
-import Miscellaneous from './components/dashboard/ExpenseTracking/Miscellaneous';
-import Dynamic from './components/dashboard/ExpenseTracking/Dynamic';
-import Accounting from './components/dashboard/Accounting'; // Create this component
 import ProtectedRoute from './components/layout/ProtectedRoutes';
-import Items from './components/dashboard/Billing/Items';
+import Commodity from './components/dashboard/Billing/Commodity';
+import Expenses from './components/dashboard/Billing/Expenses';
+import CreateCustomer from './components/dashboard/Billing/CreateCustomer';
+import ViewCustomer from './components/dashboard/Billing/ViewCustomer';
+import EditCustomer from './components/dashboard/Billing/EditCustomer';
 
 function App() {
   return (
@@ -36,18 +33,13 @@ function App() {
       >
         <Route index element={<DashboardHome />} />
         <Route path="billing/customer" element={<Customer />} />
+        <Route path="billing/customer/create" element={<CreateCustomer/>} />
+        <Route path="billing/customer/view/:id" element={<ViewCustomer />} />
+        <Route path="billing/customer/edit/:id" element={<EditCustomer />} />
+        <Route path="billing/commodity" element={<Commodity />} />
         <Route path="billing/quote" element={<Quote />} />
         <Route path="billing/invoice" element={<Invoice />} />
-        <Route path="billing/payment" element={<Payment />} />
-        <Route path="billing/items" element={<Items/>} />
-        <Route path="expense/employee" element={<EmployeeExpense />} />
-        <Route path="expense/company" element={<CompanyClient />} />
-        <Route path="expense/credit" element={<Credit />} />
-        <Route path="expense/miscellaneous" element={<Miscellaneous />} />
-        <Route path="expense/dynamic" element={<Dynamic />} />
-        <Route path="accounting" element={<Accounting/>} />
-        
-        
+        <Route path='billing/expenses' element={<Expenses/>} />
       </Route>
 
       {/* Redirect */}
