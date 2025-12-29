@@ -3,27 +3,27 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
-  const [openBilling, setOpenBilling] = useState(false);
-  const [openExpense, setOpenExpense] = useState(false);
-  const [billingHeight, setBillingHeight] = useState(0);
-  const [expenseHeight, setExpenseHeight] = useState(0);
+  const [openSalesBilling, setOpenSalesBilling] = useState(false);
+  const [openManagement, setOpenManagement] = useState(false);
+  const [salesBillingHeight, setSalesBillingHeight] = useState(0);
+  const [managementHeight, setManagementHeight] = useState(0);
   const location = useLocation();
 
   // Auto-expand sections based on active route
   useEffect(() => {
-    if (location.pathname.startsWith("/dashboard/billing")) {
-      setOpenBilling(true);
-    } else if (location.pathname.startsWith("/dashboard/expense")) {
-      setOpenExpense(true);
+    if (location.pathname.startsWith("/dashboard/sales-billing")) {
+      setOpenSalesBilling(true);
+    } else if (location.pathname.startsWith("/dashboard/management")) {
+      setOpenManagement(true);
     } else {
-      setOpenBilling(false);
-      setOpenExpense(false);
+      setOpenSalesBilling(false);
+      setOpenManagement(false);
     }
   }, [location.pathname]);
 
   const measureHeights = useCallback(() => {
-    setBillingHeight(230); // Adjusted for visual spacing
-    setExpenseHeight(180);
+    setSalesBillingHeight(230); // Adjusted for visual spacing
+    setManagementHeight(230);
   }, []);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const Sidebar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Base link style
+  // Base link style with orange and black color scheme
   const baseLinkStyle = {
     textDecoration: "none",
     padding: "10px 16px",
@@ -162,14 +162,14 @@ const Sidebar = () => {
             color: "#000000",
           }}
         >
-          W
+          M
         </div>
         <div>
           <div style={{ fontSize: "12px", fontWeight: "500", color: "#6B7280" }}>
-            Web Developer
+            Administrator
           </div>
           <div style={{ fontSize: "14px", fontWeight: "700", color: "#FFFFFF" }}>
-            Vishwakarma Smith
+            Monitorbizz
           </div>
         </div>
       </div>
@@ -194,26 +194,26 @@ const Sidebar = () => {
           <span>Dashboard</span>
         </Link>
 
-        {/* Billing Section */}
+        {/* Sales & Billing Section */}
         <div>
           <button
-            onClick={() => setOpenBilling(!openBilling)}
-            style={sectionButtonStyle(openBilling)}
-            aria-expanded={openBilling}
+            onClick={() => setOpenSalesBilling(!openSalesBilling)}
+            style={sectionButtonStyle(openSalesBilling)}
+            aria-expanded={openSalesBilling}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <span
                 className="icon-hover"
-                style={{ fontSize: "18px", color: openBilling ? "#FF6B00" : "#A1A1AA" }}
+                style={{ fontSize: "18px", color: openSalesBilling ? "#FF6B00" : "#A1A1AA" }}
               >
                 💰
               </span>
-              <span>Billing</span>
+              <span>Sales & Billing</span>
             </div>
             <span
               className="rotate"
               style={{
-                transform: openBilling ? "rotate(180deg)" : "rotate(0deg)",
+                transform: openSalesBilling ? "rotate(180deg)" : "rotate(0deg)",
                 color: "#FF6B00",
                 transition: "transform 0.25s ease",
               }}
@@ -224,78 +224,11 @@ const Sidebar = () => {
 
           <div
             style={{
-              height: openBilling ? `${billingHeight}px` : "0px",
-              opacity: openBilling ? 1 : 0,
+              height: openSalesBilling ? `${salesBillingHeight}px` : "0px",
+              opacity: openSalesBilling ? 1 : 0,
               overflow: "hidden",
               transition: "height 0.3s ease, opacity 0.2s ease",
-              marginTop: openBilling ? "8px" : "0",
-              
-            }}
-          >
-            <div
-              style={{
-                paddingLeft: "28px",
-                display: "flex",
-                flexDirection: "column",
-              gap: "6px",
-                
-              }}
-            >
-              {[
-                { to: "/dashboard/billing/customer", label: "Customer Info" },
-                { to: "/dashboard/billing/quote", label: "Quote" },
-                { to: "/dashboard/billing/invoice", label: "Invoice" },
-                { to: "/dashboard/billing/payment", label: "Payment" },
-                { to: "/dashboard/billing/items", label: "Items" },
-              ].map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  style={getLinkStyle(item.to)}
-                  className="icon-hover"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Expense Tracking Section */}
-        <div>
-          <button
-            onClick={() => setOpenExpense(!openExpense)}
-            style={sectionButtonStyle(openExpense)}
-            aria-expanded={openExpense}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span
-                className="icon-hover"
-                style={{ fontSize: "18px", color: openExpense ? "#FF6B00" : "#A1A1AA" }}
-              >
-                📉
-              </span>
-              <span>Expense Tracking</span>
-            </div>
-            <span
-              className="rotate"
-              style={{
-                transform: openExpense ? "rotate(180deg)" : "rotate(0deg)",
-                color: "#FF6B00",
-                transition: "transform 0.25s ease",
-              }}
-            >
-              ▼
-            </span>
-          </button>
-
-          <div
-            style={{
-              height: openExpense ? `${expenseHeight}px` : "0px",
-              opacity: openExpense ? 1 : 0,
-              overflow: "hidden",
-              transition: "height 0.3s ease, opacity 0.2s ease",
-              marginTop: openExpense ? "8px" : "0",
+              marginTop: openSalesBilling ? "8px" : "0",
             }}
           >
             <div
@@ -307,11 +240,11 @@ const Sidebar = () => {
               }}
             >
               {[
-                { to: "/dashboard/expense/employee", label: "Employee Expense" },
-                { to: "/dashboard/expense/company", label: "Company Client" },
-                { to: "/dashboard/expense/credit", label: "Credit" },
-                { to: "/dashboard/expense/miscellaneous", label: "Miscellaneous" },
-                { to: "/dashboard/expense/dynamic", label: "Dynamic" },
+                { to: "/dashboard/sales-billing/customers", label: "Customers" },
+                { to: "/dashboard/sales-billing/commodity", label: "Commodity" },
+                { to: "/dashboard/sales-billing/quotations", label: "Quotations" },
+                { to: "/dashboard/sales-billing/invoices", label: "Invoices" },
+                { to: "/dashboard/sales-billing/expenses", label: "Expenses" },
               ].map((item) => (
                 <Link
                   key={item.to}
@@ -326,19 +259,71 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* Accounting */}
-        <Link
-          to="/dashboard/accounting"
-          style={topLevelStyle("/dashboard/accounting")}
-        >
-          <span
-            className="icon-hover"
-            style={{ fontSize: "18px", color: isActive("/dashboard/accounting") ? "#FF6B00" : "#A1A1AA" }}
+        {/* Management Section */}
+        <div>
+          <button
+            onClick={() => setOpenManagement(!openManagement)}
+            style={sectionButtonStyle(openManagement)}
+            aria-expanded={openManagement}
           >
-            📈
-          </span>
-          <span>Accounting</span>
-        </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                className="icon-hover"
+                style={{ fontSize: "18px", color: openManagement ? "#FF6B00" : "#A1A1AA" }}
+              >
+                👥
+              </span>
+              <span>Management</span>
+            </div>
+            <span
+              className="rotate"
+              style={{
+                transform: openManagement ? "rotate(180deg)" : "rotate(0deg)",
+                color: "#FF6B00",
+                transition: "transform 0.25s ease",
+              }}
+            >
+              ▼
+            </span>
+          </button>
+
+          <div
+            style={{
+              height: openManagement ? `${managementHeight}px` : "0px",
+              opacity: openManagement ? 1 : 0,
+              overflow: "hidden",
+              transition: "height 0.3s ease, opacity 0.2s ease",
+              marginTop: openManagement ? "8px" : "0",
+            }}
+          >
+            <div
+              style={{
+                paddingLeft: "28px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              {[
+                { to: "/dashboard/management/team", label: "Team" },
+                { to: "/dashboard/management/business-profile", label: "Business Profile" },
+                { to: "/dashboard/management/reports", label: "Reports" },
+                { to: "/dashboard/management/activity-log", label: "Activity Log" },
+                { to: "/dashboard/management/aging-report", label: "Aging Report" },
+                { to: "/dashboard/management/performance", label: "Performance" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  style={getLinkStyle(item.to)}
+                  className="icon-hover"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </nav>
 
       {/* Logout Button */}

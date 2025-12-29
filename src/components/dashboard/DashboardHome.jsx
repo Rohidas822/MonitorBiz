@@ -1,735 +1,412 @@
-// src/components/dashboard/DashboardHome.jsx
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
-import { motion, useAnimation, useInView } from 'framer-motion';
-// Lucide React Icons
-import {
-  Wallet,
-  TrendingDown,
-  FileText,
-  Calculator,
-  Search,
-  User,
-  Building,
-  CreditCard,
-  Package,
-  Plus,
-  Clock
-} from 'lucide-react';
+// src/pages/Dashboard.jsx (Bootstrap Version)
+import React, { useState, useEffect } from 'react';
+import { FaSearch, FaUser, FaUsers, FaFileAlt, FaChartLine, FaClock, FaArrowRight, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
 
-const DashboardHome = () => {
-  // === YOUR ORIGINAL DATA (unchanged) ===
-  const billingData = {
-    customer: {
-      company: "TechNova Inc.",
-      gst: "GST123456789",
-      address: "123 Innovation Blvd, Silicon Valley",
-      phone: "+1 (555) 123-4567"
-    },
-    quote: {
-      commodity: "Cloud Hosting Package",
-      pricing: "$299/month",
-      grandTotal: "$299.00"
-    },
-    invoice: {
-      grandTotal: "$299.00",
-      taxPayment: "$29.90",
-      total: "$328.90"
-    },
-    payment: {
-      receipt: "#INV-2025-001",
-      amountPaid: "$328.90",
-      pending: "$0.00"
-    }
-  };
-
-  const expenseData = {
-    employee: {
-      name: "Alex Rivera",
-      expense: "$1,250.00"
-    },
-    companyClient: {
-      client: "GlobalCorp Ltd.",
-      amount: "$5,000.00"
-    },
-    credit: {
-      description: "Vendor Credit Refund",
-      amount: "-$300.00"
-    },
-    miscellaneous: {
-      description: "Office Supplies",
-      amount: "$185.50"
-    },
-    dynamic: {
-      description: "Project Bonus",
-      amount: "$750.00"
-    }
-  };
-
-  // === DERIVED METRICS ===
-  const totalInvoiced = parseFloat(billingData.invoice.total.replace('$', ''));
-  const pendingPayments = parseFloat(billingData.payment.pending.replace('$', ''));
-  const totalExpenses =
-    parseFloat(expenseData.employee.expense.replace('$', '').replace(',', '')) +
-    parseFloat(expenseData.companyClient.amount.replace('$', '').replace(',', '')) +
-    parseFloat(expenseData.miscellaneous.amount.replace('$', '').replace(',', '')) +
-    parseFloat(expenseData.dynamic.amount.replace('$', '').replace(',', '')) -
-    parseFloat(expenseData.credit.amount.replace('-$', '').replace(',', ''));
-  const netCashFlow = totalInvoiced - totalExpenses;
-
-  // === CHART DATA ===
-  const billingPieData = [
-    { name: 'Grand Total', value: parseFloat(billingData.quote.grandTotal.replace('$', '')) },
-    { name: 'Tax Payment', value: parseFloat(billingData.invoice.taxPayment.replace('$', '')) },
-    { name: 'Pending', value: parseFloat(billingData.payment.pending.replace('$', '')) }
-  ];
-
-  const expenseBarData = [
-    { name: 'Employee', amount: parseFloat(expenseData.employee.expense.replace('$', '').replace(',', '')) },
-    { name: 'Company Client', amount: parseFloat(expenseData.companyClient.amount.replace('$', '').replace(',', '')) },
-    { name: 'Credit', amount: Math.abs(parseFloat(expenseData.credit.amount.replace('-$', '').replace(',', ''))) },
-    { name: 'Misc.', amount: parseFloat(expenseData.miscellaneous.amount.replace('$', '').replace(',', '')) },
-    { name: 'Dynamic', amount: parseFloat(expenseData.dynamic.amount.replace('$', '').replace(',', '')) }
-  ];
-
-  const COLORS = ['#FF6B00', '#FF8A3D', '#FFA772', '#FFC3A0', '#FFE0D1'];
-
-  // === SEARCH STATE ===
+const Dashboard = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // === FILTER DATA BASED ON SEARCH (simple keyword match) ===
-  const filteredBilling = useMemo(() => {
-    if (!searchQuery) return billingData;
-    const q = searchQuery.toLowerCase();
-    const matches = {};
-    Object.keys(billingData).forEach(key => {
-      const section = billingData[key];
-      let hasMatch = false;
-      const filteredSection = {};
-      Object.keys(section).forEach(field => {
-        const value = section[field]?.toString().toLowerCase();
-        if (value?.includes(q)) {
-          filteredSection[field] = billingData[key][field];
-          hasMatch = true;
-        }
-      });
-      if (hasMatch) matches[key] = filteredSection;
-    });
-    return matches;
-  }, [searchQuery, billingData]);
-
-  const filteredExpense = useMemo(() => {
-    if (!searchQuery) return expenseData;
-    const q = searchQuery.toLowerCase();
-    const matches = {};
-    Object.keys(expenseData).forEach(key => {
-      const section = expenseData[key];
-      let hasMatch = false;
-      const filteredSection = {};
-      Object.keys(section).forEach(field => {
-        const value = section[field]?.toString().toLowerCase();
-        if (value?.includes(q)) {
-          filteredSection[field] = expenseData[key][field];
-          hasMatch = true;
-        }
-      });
-      if (hasMatch) matches[key] = filteredSection;
-    });
-    return matches;
-  }, [searchQuery, expenseData]);
-
-  // === ICON MAPPING ===
-  const getIcon = (section) => {
-    switch (section) {
-      case 'customer': return <User size={16} />;
-      case 'quote': return <Package size={16} />;
-      case 'invoice': return <FileText size={16} />;
-      case 'payment': return <CreditCard size={16} />;
-      case 'employee': return <User size={16} />;
-      case 'companyClient': return <Building size={16} />;
-      case 'credit': return <CreditCard size={16} />;
-      case 'miscellaneous': return <Package size={16} />;
-      case 'dynamic': return <TrendingDown size={16} />;
-      default: return null;
-    }
+  // Mock data for dashboard
+  const todayOverview = {
+    totalCustomers: 1,
+    quotationsThisMonth: 0,
+    totalInvoices: 0
   };
 
-  // === COMPONENTS ===
-  const AnimatedIcon = ({ children, delay = 0 }) => (
-    <motion.span
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.4, delay, ease: 'easeOut' }}
-      style={{ display: 'inline-block' }}
-    >
-      {children}
-    </motion.span>
-  );
-
-  const SectionCard = ({ title, icon, children, bgColor = '#FFFFFF', borderColor = '#E5E7EB', delay = 0 }) => {
-    const controls = useAnimation();
-    const ref = React.useRef(null);
-    const isInView = useInView(ref, { once: true, margin: '-100px' });
-
-    React.useEffect(() => {
-      if (isInView) {
-        controls.start("visible");
-      }
-    }, [isInView, controls]);
-
-    return (
-      <motion.div
-        ref={ref}
-        initial="hidden"
-        animate={controls}
-        variants={{
-          hidden: { opacity: 0, y: 40 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay, ease: 'easeOut' } }
-        }}
-        style={{
-          backgroundColor: bgColor,
-          border: `1px solid ${borderColor}`,
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-          transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}
-        whileHover={{
-          y: -6,
-          boxShadow: '0 8px 30px rgba(255, 107, 0, 0.15)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          >
-            <span style={{ color: '#FF6B00', display: 'flex' }}>{icon}</span>
-          </motion.div>
-          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#1F2937' }}>{title}</h3>
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {children}
-        </div>
-      </motion.div>
-    );
+  const salesSummary = {
+    revenueThisMonth: 0,
+    outstandingInvoices: 0,
+    avgPaymentDays: 0,
+    topCustomers: []
   };
 
-  const KpiCard = ({ title, value, trend, icon: Icon, color }) => (
-    <motion.div
-      whileHover={{ y: -4 }}
-      style={{
-        backgroundColor: '#FFFFFF',
-        border: '1px solid #E5E7EB',
-        borderRadius: '16px',
-        padding: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '10px',
-          backgroundColor: `${color}20`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: color
-        }}>
-          <Icon size={18} />
-        </div>
-        <span style={{ fontSize: '13px', color: '#6B7280', fontWeight: '600' }}>{title}</span>
-      </div>
-      <div style={{ fontSize: '20px', fontWeight: '700', color: '#1F2937' }}>{value}</div>
-      <div style={{
-        fontSize: '12px',
-        fontWeight: '600',
-        color: trend.startsWith('✓') ? '#10B981' : trend.startsWith('⚠️') ? '#F59E0B' : trend.startsWith('+') ? '#10B981' : '#EF4444'
-      }}>
-        {trend}
-      </div>
-    </motion.div>
-  );
+  const setupProgress = [
+    { id: 1, title: 'Account Created', completed: true, description: 'Your Monitorbizz account is ready!' },
+    { id: 2, title: 'Add Commodity', completed: true, description: 'Set up your products and materials' },
+    { id: 3, title: 'Add Customers', completed: true, description: 'Build your customer database' },
+    { id: 4, title: 'Create Quotations/Invoices', completed: false, description: 'Start billing your customers' }
+  ];
 
-  const DataItem = ({ label, value, highlight = false, icon = null }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        {icon && <span style={{ color: '#9CA3AF' }}>{icon}</span>}
-        <span style={{ color: '#6B7280', fontWeight: '500' }}>{label}:</span>
-      </div>
-      <motion.span
-        initial={{ opacity: 0.7 }}
-        whileHover={{ opacity: 1, x: highlight ? 4 : 0 }}
-        style={{
-          color: highlight ? '#FF6B00' : '#1F2937',
-          fontWeight: highlight ? '700' : '500',
-          textAlign: 'right'
-        }}
-      >
-        {value}
-      </motion.span>
-    </div>
-  );
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const value = payload[0].value;
-      const isCredit = label === 'Credit';
-      return (
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          style={{
-            backgroundColor: '#fff',
-            padding: '12px',
-            border: '1px solid #E5E7EB',
-            borderRadius: '12px',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
-            fontSize: '13px',
-            minWidth: '100px'
-          }}
-        >
-          <p style={{ margin: 0, fontWeight: '600', color: '#1F2937' }}>{label}</p>
-          <p style={{
-            margin: 0,
-            color: isCredit ? '#EF4444' : '#FF6B00',
-            fontWeight: '700'
-          }}>
-            {isCredit ? `-$${Math.abs(value).toFixed(2)}` : `$${value.toFixed(2)}`}
-          </p>
-        </motion.div>
-      );
-    }
-    return null;
+  const businessDetails = {
+    businessId: 50,
+    plan: 'Free Plan',
+    owner: 'Rohidas Raghu Lakade'
   };
 
-  // Format currency helper
-  const formatCurrency = (num) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
-    }).format(num);
+  const user = {
+    name: 'Rohidas Raghu Lakade',
+    role: 'Administrator',
+    business: 'Cleaning Services',
+    date: new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }),
+    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "/login";
   };
 
   return (
-    <div style={{
-      padding: '32px',
-      backgroundColor: '#F9FAFB',
-      minHeight: '100vh',
-      fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      color: '#1F2937'
-    }}>
-      {/* === HEADER === */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        style={{ marginBottom: '24px' }}
-      >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '8px'
-        }}>
-          <AnimatedIcon delay={0}>
-            <div style={{ color: '#FF6B00' }}>
-              <FileText size={28} />
-            </div>
-          </AnimatedIcon>
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: '800',
-            margin: 0,
-            background: 'linear-gradient(90deg, #FF6B00, #FF8A3D)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            MonitorBiz Dashboard
-          </h1>
-        </div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          style={{
-            color: '#6B7280',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}
-        >
-          Manage Billing, Expenses & Accounting in one professional workspace.
-        </motion.p>
-      </motion.header>
-
-      {/* === SEARCH BAR === */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        style={{
-          maxWidth: '600px',
-          marginBottom: '24px'
-        }}
-      >
-        <div style={{
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E5E7EB',
-          borderRadius: '12px',
-          padding: '8px 16px'
-        }}>
-          <Search size={18} style={{ color: '#9CA3AF', marginRight: '10px' }} />
-          <input
-            type="text"
-            placeholder="Search billing or expense records..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              border: 'none',
-              outline: 'none',
-              fontSize: '14px',
-              background: 'transparent',
-              padding: '8px 0'
-            }}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#9CA3AF',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      </motion.div>
-
-      {/* === KPI CARDS === */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '28px'
-        }}
-      >
-        <KpiCard
-          title="Total Invoiced"
-          value={formatCurrency(totalInvoiced)}
-          trend="+12% from last month"
-          icon={Wallet}
-          color="#FF6B00"
-        />
-        <KpiCard
-          title="Pending Payments"
-          value={formatCurrency(pendingPayments)}
-          trend={pendingPayments === 0 ? "✓ Fully Paid" : "⚠️ Overdue"}
-          icon={Clock}
-          color={pendingPayments === 0 ? "#10B981" : "#F59E0B"}
-        />
-        <KpiCard
-          title="Total Expenses"
-          value={formatCurrency(totalExpenses)}
-          trend="+5% from last month"
-          icon={TrendingDown}
-          color="#EF4444"
-        />
-        <KpiCard
-          title="Net Cash Flow"
-          value={formatCurrency(netCashFlow)}
-          trend={netCashFlow >= 0 ? "✅ Positive" : "⚠️ Negative"}
-          icon={Calculator}
-          color={netCashFlow >= 0 ? "#10B981" : "#F59E0B"}
-        />
-      </motion.div>
-
-      {/* === MAIN GRID === */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: '28px',
-        marginBottom: '32px'
-      }}>
-
-        {/* === BILLING CARD === */}
-        <SectionCard title="Billing" icon={<Wallet size={22} />} delay={0.1}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {Object.keys(filteredBilling).length === 0 && searchQuery && (
-              <div style={{ color: '#6B7280', fontStyle: 'italic' }}>No billing results for "{searchQuery}"</div>
-            )}
-            {(!searchQuery || filteredBilling.customer) && (
-              <>
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <User size={16} /> Customer Info
-                </div>
-                {filteredBilling.customer?.company && <DataItem label="Company" value={filteredBilling.customer.company} icon={<Building size={14} />} />}
-                {filteredBilling.customer?.gst && <DataItem label="G.S.T." value={filteredBilling.customer.gst} />}
-                {filteredBilling.customer?.address && <DataItem label="Address" value={filteredBilling.customer.address} />}
-                {filteredBilling.customer?.phone && <DataItem label="Phone" value={filteredBilling.customer.phone} />}
-                <Link to="/dashboard/billing" style={{ color: '#FF6B00', fontSize: '13px', fontWeight: '600', marginTop: '8px' }}>
-                  View all billing →
-                </Link>
-              </>
-            )}
-
-            {(!searchQuery || filteredBilling.quote) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Package size={16} /> Quote
-                </div>
-                {filteredBilling.quote?.commodity && <DataItem label="Commodity" value={filteredBilling.quote.commodity} />}
-                {filteredBilling.quote?.pricing && <DataItem label="Pricing" value={filteredBilling.quote.pricing} />}
-                {filteredBilling.quote?.grandTotal && <DataItem label="Grand Total" value={filteredBilling.quote.grandTotal} highlight />}
-              </>
-            )}
-
-            {(!searchQuery || filteredBilling.invoice) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <FileText size={16} /> Invoice
-                </div>
-                {filteredBilling.invoice?.grandTotal && <DataItem label="Grand Total" value={filteredBilling.invoice.grandTotal} />}
-                {filteredBilling.invoice?.taxPayment && <DataItem label="Tax Payment" value={filteredBilling.invoice.taxPayment} />}
-                {filteredBilling.invoice?.total && <DataItem label="Total" value={filteredBilling.invoice.total} highlight />}
-              </>
-            )}
-
-            {(!searchQuery || filteredBilling.payment) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CreditCard size={16} /> Payment Receipt
-                </div>
-                {filteredBilling.payment?.receipt && <DataItem label="Receipt #" value={filteredBilling.payment.receipt} />}
-                {filteredBilling.payment?.amountPaid && <DataItem label="Amount Paid" value={filteredBilling.payment.amountPaid} highlight />}
-                {filteredBilling.payment?.pending && <DataItem label="Pending" value={filteredBilling.payment.pending} />}
-              </>
-            )}
-
-            <div style={{ height: '220px', marginTop: '16px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={billingPieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={75}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {billingPieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                        stroke="none"
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-bottom border-gray-200">
+        <div className="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <h1 className="h5 fw-bold text-orange-600 mb-0">Monitorbizz</h1>
           </div>
-        </SectionCard>
-
-        {/* === EXPENSE TRACKING CARD === */}
-        <SectionCard title="Expense Tracking" icon={<TrendingDown size={22} />} delay={0.2}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {Object.keys(filteredExpense).length === 0 && searchQuery && (
-              <div style={{ color: '#6B7280', fontStyle: 'italic' }}>No expense results for "{searchQuery}"</div>
-            )}
-            {(!searchQuery || filteredExpense.employee) && (
-              <>
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <User size={16} /> Employee Expense
-                </div>
-                {filteredExpense.employee?.name && <DataItem label="Employee" value={filteredExpense.employee.name} />}
-                {filteredExpense.employee?.expense && <DataItem label="Expense" value={filteredExpense.employee.expense} highlight />}
-                <Link to="/dashboard/expense" style={{ color: '#FF6B00', fontSize: '13px', fontWeight: '600', marginTop: '8px' }}>
-                  View all expenses →
-                </Link>
-              </>
-            )}
-
-            {(!searchQuery || filteredExpense.companyClient) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Building size={16} /> Company Client
-                </div>
-                {filteredExpense.companyClient?.client && <DataItem label="Client" value={filteredExpense.companyClient.client} />}
-                {filteredExpense.companyClient?.amount && <DataItem label="Amount" value={filteredExpense.companyClient.amount} highlight />}
-              </>
-            )}
-
-            {(!searchQuery || filteredExpense.credit) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CreditCard size={16} /> Credit
-                </div>
-                {filteredExpense.credit?.description && <DataItem label="Description" value={filteredExpense.credit.description} />}
-                {filteredExpense.credit?.amount && <DataItem label="Amount" value={filteredExpense.credit.amount} highlight />}
-              </>
-            )}
-
-            {(!searchQuery || filteredExpense.miscellaneous) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Package size={16} /> Miscellaneous
-                </div>
-                {filteredExpense.miscellaneous?.description && <DataItem label="Description" value={filteredExpense.miscellaneous.description} />}
-                {filteredExpense.miscellaneous?.amount && <DataItem label="Amount" value={filteredExpense.miscellaneous.amount} />}
-              </>
-            )}
-
-            {(!searchQuery || filteredExpense.dynamic) && (
-              <>
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '12px 0' }} />
-                <div style={{ fontWeight: '700', color: '#1F2937', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <TrendingDown size={16} /> Dynamic
-                </div>
-                {filteredExpense.dynamic?.description && <DataItem label="Description" value={filteredExpense.dynamic.description} />}
-                {filteredExpense.dynamic?.amount && <DataItem label="Amount" value={filteredExpense.dynamic.amount} highlight />}
-              </>
-            )}
-
-            <div style={{ height: '220px', marginTop: '16px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={expenseBarData}>
-                  <CartesianGrid strokeDasharray="4 4" stroke="#E5E7EB" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#6B7280' }}
-                    tickFormatter={(value) => `$${value}`}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
-                    {expenseBarData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+          
+          <div className="d-flex align-items-center">
+            <div className="position-relative me-3">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="form-control ps-4 pe-3 py-2 border border-gray-300 rounded-pill"
+              />
+              <FaSearch className="position-absolute top-50 start-0 translate-middle-y text-gray-400 ms-2" />
             </div>
-          </div>
-        </SectionCard>
-
-        {/* === ACCOUNTING CARD === */}
-        <SectionCard
-          title="Accounting"
-          icon={<Calculator size={22} />}
-          bgColor="#FFF8F3"
-          borderColor="#FFD9C3"
-          delay={0.3}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px', textAlign: 'center' }}>
-            <motion.div
-              animate={{ rotate: [0, 3, 0, -3, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Calculator size={48} style={{ opacity: 0.4, color: '#FF6B00' }} />
-            </motion.div>
-            <p style={{ color: '#6B7280', fontSize: '15px', lineHeight: 1.5, maxWidth: '280px' }}>
-              Your financial overview, balance sheets, and reports will appear here.
-            </p>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                to="/dashboard/accounting"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '10px 20px',
-                  backgroundColor: '#FF6B00',
-                  color: '#FFFFFF',
-                  borderRadius: '10px',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'background 0.3s ease',
-                  boxShadow: '0 2px 8px rgba(255, 107, 0, 0.3)'
-                }}
+            
+            <div className="position-relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="btn btn-outline-secondary d-flex align-items-center gap-2"
               >
-                <Plus size={16} />
-                Go to Accounting
-              </Link>
-            </motion.div>
+                <span className="fw-medium">{user.name}</span>
+                <FaArrowRight className="text-gray-400" />
+              </button>
+              
+              {isMenuOpen && (
+                <div className="position-absolute end-0 mt-2 w-200 bg-white rounded shadow border border-gray-200 z-50">
+                  <div className="py-2">
+                    <a href="/profile" className="dropdown-item d-flex align-items-center">
+                      <FaUser className="me-2" /> My Account
+                    </a>
+                    <a href="/team" className="dropdown-item d-flex align-items-center">
+                      <FaUsers className="me-2" /> Team
+                    </a>
+                    <button
+                      onClick={handleLogout}
+                      className="dropdown-item d-flex align-items-center w-100"
+                    >
+                      <FaArrowRight className="me-2 rotate-180" /> Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </SectionCard>
-      </div>
-
-      {/* === FOOTER === */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        style={{
-          paddingTop: '24px',
-          borderTop: '1px solid #FFD9C3',
-          textAlign: 'center',
-          color: '#6B7280',
-          fontSize: '14px'
-        }}
-      >
-        <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', gap: '6px', alignItems: 'center' }}>
-          <Clock size={14} />
-          <span>Last updated: Just now</span>
         </div>
-        <p>
-          Need help? Contact support or explore our{' '}
-          <Link to="#" style={{ color: '#FF6B00', fontWeight: '600', textDecoration: 'none' }}>
-            documentation
-          </Link>.
-        </p>
-      </motion.footer>
+      </header>
+
+      {/* Main Content */}
+      <div className="container-fluid px-4 py-4">
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-4 p-4 mb-4 text-black">
+          <div className="row align-items-start">
+            <div className="col-md-8">
+              <h2 className="h4 fw-bold mb-2">Welcome back, {user.name}!</h2>
+              <p className="mb-3">{user.business} • {user.role}</p>
+              <div className="d-flex align-items-center mb-3">
+                <FaClock className="me-2" />
+                {user.date} • {user.time}
+              </div>
+              <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center me-4">
+                  <span className="display-6 fw-bold">50</span>
+                  <span className="ms-2 small">Business ID</span>
+                </div>
+                <div className="bg-white bg-opacity-20 rounded-circle p-2">
+                  <FaChartLine className="fs-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Today's Overview */}
+        <div className="card mb-4">
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <h3 className="h5 fw-bold mb-0">Today's Overview</h3>
+            <div className="d-flex align-items-center text-green-500">
+              <div className="w-3 h-3 bg-green-500 rounded-circle me-2"></div>
+              Live Data
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="row g-3">
+              {/* Total Customers */}
+              <div className="col-md-4">
+                <div className="card h-100 border border-blue-200 bg-blue-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="display-5 fw-bold text-blue-600">{todayOverview.totalCustomers}</div>
+                      <div className="small fw-medium text-blue-800">Total Customers</div>
+                      <div className="small text-blue-600">Active clients</div>
+                    </div>
+                    <FaUsers className="text-blue-400 fs-3" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Quotations This Month */}
+              <div className="col-md-4">
+                <div className="card h-100 border border-green-200 bg-green-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="display-5 fw-bold text-green-600">{todayOverview.quotationsThisMonth}</div>
+                      <div className="small fw-medium text-green-800">Quotations This Month</div>
+                      <div className="small text-green-600">Generated quotes</div>
+                    </div>
+                    <FaFileAlt className="text-green-400 fs-3" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Total Invoices */}
+              <div className="col-md-4">
+                <div className="card h-100 border border-purple-200 bg-purple-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="display-5 fw-bold text-purple-600">{todayOverview.totalInvoices}</div>
+                      <div className="small fw-medium text-purple-800">Total Invoices</div>
+                      <div className="small text-purple-600">Billed amount</div>
+                    </div>
+                    <FaFileAlt className="text-purple-400 fs-3" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sales Summary */}
+        <div className="card mb-4">
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h3 className="h5 fw-bold mb-0">Sales Summary</h3>
+              <p className="small text-muted mb-0">Financial performance overview</p>
+            </div>
+            <a href="/reports" className="text-decoration-none text-orange-600 fw-medium">
+              View Reports →
+            </a>
+          </div>
+          <div className="card-body">
+            <div className="row g-3 mb-3">
+              {/* Revenue This Month */}
+              <div className="col-md-3">
+                <div className="card h-100 border border-green-200 bg-green-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fs-4 fw-bold text-green-600">₹{salesSummary.revenueThisMonth}</div>
+                      <div className="small text-green-800">Revenue (This Month)</div>
+                    </div>
+                    <FaFileAlt className="text-green-400 fs-4" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Outstanding Invoices */}
+              <div className="col-md-3">
+                <div className="card h-100 border border-red-200 bg-red-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fs-4 fw-bold text-red-600">₹{salesSummary.outstandingInvoices}</div>
+                      <div className="small text-red-800">Outstanding Invoices</div>
+                    </div>
+                    <FaTimes className="text-red-400 fs-4" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Avg. Payment Days */}
+              <div className="col-md-3">
+                <div className="card h-100 border border-blue-200 bg-blue-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fs-4 fw-bold text-blue-600">{salesSummary.avgPaymentDays}</div>
+                      <div className="small text-blue-800">Avg. Payment Days</div>
+                    </div>
+                    <FaClock className="text-blue-400 fs-4" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Top Customers */}
+              <div className="col-md-3">
+                <div className="card h-100 border border-purple-200 bg-purple-50">
+                  <div className="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fs-4 fw-bold text-purple-600">Top Customers</div>
+                      <div className="small text-purple-800">By Revenue</div>
+                    </div>
+                    <FaUsers className="text-purple-400 fs-4" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-3">
+              <h6 className="fw-medium text-gray-700 mb-1">Top 3 Customers</h6>
+              <p className="small text-gray-500">No customer data available</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="card mb-4">
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <div>
+              <h3 className="h5 fw-bold mb-0">Quick Actions</h3>
+              <p className="small text-muted mb-0">Get started with common tasks</p>
+            </div>
+            <button className="btn btn-link text-orange-600 fw-medium p-0">
+              Fast Setup
+            </button>
+          </div>
+          <div className="card-body">
+            <div className="row g-3">
+              {/* Create Quote */}
+              <div className="col-md-6">
+                <div className="card h-100 border border-blue-200 bg-blue-50 text-center cursor-pointer hover:bg-blue-100 transition-colors">
+                  <div className="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <FaFileAlt className="text-blue-600 fs-3 mb-3" />
+                    <div className="fw-medium text-blue-800 mb-1">Create Quote</div>
+                    <div className="small text-blue-600">New quotation</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Add Customer */}
+              <div className="col-md-6">
+                <div className="card h-100 border border-green-200 bg-green-50 text-center cursor-pointer hover:bg-green-100 transition-colors">
+                  <div className="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <FaUsers className="text-green-600 fs-3 mb-3" />
+                    <div className="fw-medium text-green-800 mb-1">Add Customer</div>
+                    <div className="small text-green-600">New client</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Setup Progress & Business Details */}
+        <div className="row g-4 mb-4">
+          {/* Setup Progress */}
+          <div className="col-lg-6">
+            <div className="card h-100">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 className="h5 fw-bold mb-0">Setup Progress</h3>
+                  <p className="small text-muted mb-0">Complete your billing setup</p>
+                </div>
+                <div className="d-flex align-items-center text-blue-500">
+                  <div className="w-3 h-3 bg-blue-500 rounded-circle me-2"></div>
+                  In Progress
+                </div>
+              </div>
+              <div className="card-body">
+                <div className="d-flex flex-column gap-3">
+                  {setupProgress.map((item, index) => (
+                    <div key={item.id} className="d-flex align-items-start gap-3">
+                      <div className={`rounded-circle d-flex align-items-center justify-content-center ${
+                        item.completed ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+                      }`} style={{ width: '24px', height: '24px' }}>
+                        {item.completed ? <FaCheck /> : <span>{item.id}</span>}
+                      </div>
+                      <div>
+                        <div className="fw-medium text-gray-800">{item.title}</div>
+                        <div className="small text-gray-500">{item.description}</div>
+                        {item.completed && (
+                          <div className="mt-2">
+                            <div className="progress" style={{ height: '4px' }}>
+                              <div className="progress-bar bg-green-500" role="progressbar" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Business Details */}
+          <div className="col-lg-6">
+            <div className="card h-100">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 className="h5 fw-bold mb-0">Business Details</h3>
+                  <p className="small text-muted mb-0">Your account information</p>
+                </div>
+                <div className="d-flex align-items-center text-green-500">
+                  <div className="w-3 h-3 bg-green-500 rounded-circle me-2"></div>
+                  Active
+                </div>
+              </div>
+              <div className="card-body">
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between">
+                    <span className="small text-gray-500">Business ID</span>
+                    <span className="fw-medium text-gray-800">{businessDetails.businessId}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="small text-gray-500">Plan</span>
+                    <span className="fw-medium text-gray-800">{businessDetails.plan}</span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="small text-gray-500">Owner</span>
+                    <span className="fw-medium text-gray-800">{businessDetails.owner}</span>
+                  </div>
+                </div>
+                
+                <div className="mt-3 p-3 bg-blue-50 rounded">
+                  <div className="d-flex align-items-center">
+                    <FaChartLine className="text-blue-600 me-2" />
+                    <div>
+                      <div className="fw-medium text-blue-800">Upgrade Available</div>
+                      <div className="small text-blue-600">Unlock manufacturing features</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="card">
+          <div className="card-body">
+            <div className="d-flex align-items-center mb-3">
+              <FaInfoCircle className="text-orange-600 me-2" />
+              <h3 className="h5 fw-bold mb-0">Built for Makers, Not Offices</h3>
+            </div>
+            <p className="small text-gray-600 mb-3">
+              Track every job, machine hour, and material gram. No more guessing where your costs go.
+            </p>
+            <div className="d-flex flex-wrap gap-2">
+              <span className="badge bg-success text-white">
+                ✓ Real-time tracking
+              </span>
+              <span className="badge bg-warning text-dark">
+                ✓ Cost analysis
+              </span>
+              <span className="badge bg-primary text-white">
+                ✓ Machine monitoring
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default DashboardHome;
+export default Dashboard;

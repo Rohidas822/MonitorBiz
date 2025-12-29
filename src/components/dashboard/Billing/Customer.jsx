@@ -77,7 +77,7 @@ const Customer = () => {
     }));
   };
 
-  // ✅ Info Icon: Use secondary color, not brand color
+  // ✅ Info Icon: Use black color
   const InfoIcon = ({ tooltip }) => (
     <motion.span
       whileHover={{ scale: 1.2, rotate: 15 }}
@@ -86,7 +86,7 @@ const Customer = () => {
         display: 'inline-flex',
         alignItems: 'center',
         marginLeft: '6px',
-        color: '#6B7280', // Secondary text color
+        color: '#000000', // Black
         cursor: 'help'
       }}
       title={tooltip}
@@ -95,10 +95,10 @@ const Customer = () => {
     </motion.span>
   );
 
-  // ✅ Copy Button: Use neutral with subtle hover
+  // ✅ Copy Button: Use black border, orange hover
   const CopyIcon = ({ onClick, tooltip }) => (
     <motion.button
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ scale: 1.1, borderColor: '#FF6B00' }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       style={{
@@ -106,17 +106,15 @@ const Customer = () => {
         alignItems: 'center',
         gap: '6px',
         background: 'transparent',
-        border: '1px solid #E5E7EB',
+        border: '1px solid #000000',
         borderRadius: '6px',
-        color: '#6B7280',
+        color: '#000000',
         cursor: 'pointer',
         fontSize: '14px',
         fontWeight: '500',
         padding: '6px 10px',
         transition: 'all 0.2s ease'
       }}
-      onMouseEnter={(e) => e.currentTarget.style.borderColor = '#D1D5DB'}
-      onMouseLeave={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}
       title={tooltip}
     >
       <FaCopy size={14} />
@@ -128,15 +126,15 @@ const Customer = () => {
     <div style={{
       padding: '24px',
       fontFamily: '"Inter", -apple-system, Segoe UI, Roboto, sans-serif',
-      color: '#1F2937', // Primary text
-      backgroundColor: '#FFFFFF', // Clean background
+      color: '#000000', // Black text
+      backgroundColor: '#FFFFFF', // White background
       minHeight: '100vh'
     }}>
       <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1F2937', margin: 0 }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#000000', margin: 0 }}>
           Customer Information
         </h1>
-        <p style={{ fontSize: '16px', color: '#6B7280', marginTop: '8px' }}>
+        <p style={{ fontSize: '16px', color: '#333333', marginTop: '8px' }}>
           Manage billing/shipping details, GST, and contact information
         </p>
       </div>
@@ -144,8 +142,8 @@ const Customer = () => {
       <div style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '16px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)', // Subtle shadow
-        border: '1px solid #E5E7EB',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)', // Subtle black shadow
+        border: '1px solid #000000',
         padding: '32px',
         maxWidth: '1200px',
         margin: '0 auto'
@@ -207,7 +205,7 @@ const Customer = () => {
 
         {/* Tabs */}
         <div style={{
-          borderBottom: '1px solid #E5E7EB',
+          borderBottom: '1px solid #000000',
           marginBottom: '24px',
           paddingBottom: '12px'
         }}>
@@ -225,7 +223,7 @@ const Customer = () => {
                     padding: '8px 16px',
                     fontSize: '14px',
                     fontWeight: isActive ? '600' : '400',
-                    color: isActive ? '#FF6B00' : '#6B7280', // Orange only when active
+                    color: isActive ? '#FF6B00' : '#000000', // Orange when active, black otherwise
                     borderBottom: isActive ? '2px solid #FF6B00' : 'none',
                     cursor: 'pointer',
                     transition: 'color 0.2s'
@@ -247,7 +245,7 @@ const Customer = () => {
               alignItems: 'center',
               marginBottom: '24px'
             }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937' }}>Billing Address</h2>
+              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#000000' }}>Billing Address</h2>
               <CopyIcon onClick={copyBillingToShipping} tooltip="Copy to shipping" />
             </div>
 
@@ -320,7 +318,7 @@ const Customer = () => {
               alignItems: 'center',
               marginBottom: '24px'
             }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937' }}>Shipping Address</h2>
+              <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#000000' }}>Shipping Address</h2>
             </div>
 
             <div style={{
@@ -403,7 +401,7 @@ const Customer = () => {
           <div style={{
             textAlign: 'center',
             padding: '40px',
-            color: '#6B7280',
+            color: '#333333',
             fontSize: '18px'
           }}>
             {activeTab === 'other-details' && 'Other Details content will appear here.'}
@@ -417,36 +415,33 @@ const Customer = () => {
   );
 };
 
-// ✅ Updated Styles Using Brand Palette
+// ✅ Updated Styles Using Orange & Black Palette
 const labelStyle = { 
   fontSize: '14px', 
   fontWeight: '600', 
   marginBottom: '8px', 
   display: 'block',
-  color: '#1F2937'
+  color: '#000000'
 };
 
 const inputStyle = {
   width: '100%',
   padding: '12px 16px',
-  border: '1px solid #E5E7EB', // Brand border color
+  border: '1px solid #000000', // Black border
   borderRadius: '10px',
   backgroundColor: '#FFFFFF', // Clean white background
   fontSize: '16px',
-  color: '#1F2937',
+  color: '#000000',
   transition: 'border-color 0.2s',
   outline: 'none'
 };
 
-// Hover effect for inputs
-// (We’ll add via inline style events or move to CSS-in-JS later)
-
 const resetBtnStyle = {
   padding: '10px 24px',
   backgroundColor: '#FFFFFF',
-  color: '#374151',
+  color: '#000000',
   borderRadius: '10px',
-  border: '1px solid #D1D5DB',
+  border: '1px solid #000000',
   fontWeight: '500',
   cursor: 'pointer',
   transition: 'all 0.2s ease'
@@ -454,7 +449,7 @@ const resetBtnStyle = {
 
 const saveBtnStyle = {
   padding: '10px 28px',
-  backgroundColor: '#FF6B00', // ✅ Primary brand orange
+  backgroundColor: '#FF6B00', // Primary orange
   color: '#FFFFFF',
   borderRadius: '10px',
   border: 'none',

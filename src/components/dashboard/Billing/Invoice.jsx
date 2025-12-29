@@ -21,6 +21,7 @@ const Invoice = () => {
   };
 
   const [invoice, setInvoice] = useState(originalInvoice);
+  const [taxRate, setTaxRate] = useState(18); // ✅ Now editable via state
   const [payment, setPayment] = useState({ method: 'upi', amount: '', reference: '' });
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [errors, setErrors] = useState({});
@@ -30,7 +31,6 @@ const Invoice = () => {
 
   // Derived values
   const subtotal = invoice.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-  const taxRate = 18;
   const taxAmount = (subtotal * taxRate) / 100;
   const grandTotal = subtotal + taxAmount;
   const totalPaid = paymentHistory.reduce((sum, p) => sum + p.amount, 0);
@@ -131,6 +131,7 @@ const Invoice = () => {
 
   const handleReset = () => {
     setInvoice(originalInvoice);
+    setTaxRate(18); // ✅ Reset GST rate too
     setPaymentHistory([]);
     setIsDirty(false);
     setErrors({});
@@ -146,7 +147,7 @@ const Invoice = () => {
     // Simulate API call
     try {
       await new Promise(resolve => setTimeout(resolve, 800));
-      console.log('Saved invoice:', invoice);
+      console.log('Saved invoice:', invoice, 'GST Rate:', taxRate);
       setIsDirty(false);
       setSaveStatus('success');
       setTimeout(() => setSaveStatus(null), 3000);
@@ -234,6 +235,7 @@ const Invoice = () => {
     doc.text('Subtotal', right - 70, totalStartY);
     doc.text(subtotal.toLocaleString('en-IN'), right, totalStartY, { align: 'right' });
 
+    // ✅ GST line in PDF now uses dynamic taxRate
     doc.text(`GST (${taxRate}%)`, right - 70, totalStartY + 6);
     doc.text(taxAmount.toLocaleString('en-IN'), right, totalStartY + 6, { align: 'right' });
 
@@ -443,8 +445,26 @@ const Invoice = () => {
                   <span className="text-muted">Subtotal</span>
                   <span className="text-dark">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-muted">GST ({taxRate}%)</span>
+                {/* ✅ Editable GST % — inline, minimal, matches design */}
+                <div className="d-flex justify-content-between mb-2 align-items-center">
+                  <div className="text-muted d-flex align-items-center">
+                    GST (
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={taxRate}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value) || 0;
+                        setTaxRate(val);
+                        setIsDirty(true);
+                      }}
+                      className="form-control form-control-sm border-0 p-0 text-muted bg-transparent"
+                      style={{ width: '40px', textAlign: 'right', fontSize: '0.875rem' }}
+                    />
+                    %)
+                  </div>
                   <span className="text-dark">₹{taxAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="d-flex justify-content-between pt-2 mt-2 border-top border-secondary fw-bold" style={{ fontSize: '1.1rem' }}>
