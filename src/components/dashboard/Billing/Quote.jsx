@@ -1,53 +1,110 @@
 // Quote.jsx
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaUserCircle,
   FaFileAlt,
   FaPlus,
   FaUsers,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 const Quote = () => {
-  // Custom orange color
-  const orangeColor = '#FF6F00';
+  const navigate = useNavigate();
+  const orangeColor = "#FF6F00";
+  const darkTextColor = "#111827";
+  const lightGray = "#F3F4F6";
+  const borderColor = "#E5E7EB";
+  const backgroundColor = "#F9FAFB";
+
+  const handleCreateQuote = () => {
+    navigate("/dashboard/billing/quote/new");
+  };
+
+  const handleAddCustomer = () => {
+    navigate("/dashboard/billing/customer/create");
+  };
 
   return (
-    <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa' }}>
+    <div
+      style={{
+        padding: "24px",
+        backgroundColor: backgroundColor,
+        minHeight: "100vh",
+        fontFamily:
+          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        color: darkTextColor,
+      }}
+    >
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="h4 fw-bold text-dark">Quotations</h1>
-        <div className="d-flex align-items-center">
-          <div className="position-relative me-3">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "24px",
+            fontWeight: "700",
+            margin: 0,
+            color: "#000000",
+          }}
+        >
+          Quotations
+        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          {/* Search */}
+          <div style={{ position: "relative", width: "220px" }}>
+            <FaSearch
+              style={{
+                position: "absolute",
+                left: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#6B7280",
+                pointerEvents: "none",
+              }}
+            />
             <input
               type="text"
               placeholder="Search..."
-              className="form-control ps-5"
               style={{
-                borderColor: '#ced4da',
-                width: '220px',
-              }}
-            />
-            <FaSearch
-              className="position-absolute"
-              style={{
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#6c757d',
+                width: "100%",
+                paddingLeft: "36px",
+                paddingRight: "12px",
+                paddingTop: "8px",
+                paddingBottom: "8px",
+                borderRadius: "8px",
+                border: `1px solid ${borderColor}`,
+                fontSize: "14px",
+                color: darkTextColor,
+                outline: "none",
               }}
             />
           </div>
-          <div className="d-flex align-items-center text-dark">
-            <FaUserCircle className="me-2" />
+
+          {/* User Info */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "14px",
+            }}
+          >
+            <FaUserCircle size={20} color="#4B5563" />
             <span>Rohidas Raghu Lakade</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              className="bi bi-chevron-down ms-1"
+              width="14"
+              height="14"
               viewBox="0 0 16 16"
+              fill="#6B7280"
             >
               <path
                 fillRule="evenodd"
@@ -59,44 +116,102 @@ const Quote = () => {
       </div>
 
       {/* Quotation Header Card */}
-      <div className="card shadow-sm mb-4">
-        <div className="card-body d-flex justify-content-between align-items-center">
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          padding: "24px",
+          marginBottom: "24px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "24px",
+          }}
+        >
           <div>
-            <h2 className="h5 fw-bold text-dark mb-1">Quotations</h2>
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb p-0 mb-1">
-                <li className="breadcrumb-item">
-                  <a href="#" className="text-decoration-none text-dark">
-                    <FaFileAlt className="me-1" /> Home
-                  </a>
-                </li>
-                <li className="breadcrumb-item active" aria-current="page">
-                  Quotations
-                </li>
-              </ol>
-            </nav>
-            <p className="text-muted mb-0">Manage customer quotes and proposals</p>
+            <h2
+              style={{
+                fontSize: "18px",
+                fontWeight: "700",
+                margin: "0 0 8px 0",
+                color: "#000000",
+              }}
+            >
+              Quotations
+            </h2>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "13px",
+                color: "#6B7280",
+                marginBottom: "8px",
+              }}
+            >
+              <FaFileAlt size={12} />
+              <span>Home</span>
+              <span> / </span>
+              <span style={{ color: "#4B5563" }}>Quotations</span>
+            </div>
+            <p style={{ fontSize: "14px", color: "#6B7280", margin: 0 }}>
+              Manage customer quotes and proposals
+            </p>
           </div>
-          <div className="d-flex align-items-center">
-            <span
-              className="badge rounded-pill me-3"
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div
               style={{
-                backgroundColor: orangeColor,
-                color: 'white',
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 12px",
+                borderRadius: "16px",
+                backgroundColor: `${orangeColor}20`,
+                color: orangeColor,
+                fontSize: "14px",
+                fontWeight: "600",
               }}
             >
-              <span className="me-1">●</span> 0 Total
-            </span>
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  backgroundColor: orangeColor,
+                }}
+              ></span>
+              0 Total
+            </div>
             <button
-              className="btn text-white d-flex align-items-center"
+              onClick={handleCreateQuote}
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+                borderRadius: "8px",
                 backgroundColor: orangeColor,
-                borderColor: orangeColor,
+                color: "#FFFFFF",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
               }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = '#e65100')}
-              onMouseOut={(e) => (e.target.style.backgroundColor = orangeColor)}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#E05A00")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = orangeColor)
+              }
             >
-              <FaPlus className="me-2" />
+              <FaPlus size={14} />
               New Quotation
             </button>
           </div>
@@ -104,41 +219,108 @@ const Quote = () => {
       </div>
 
       {/* Empty State */}
-      <div className="card shadow-sm">
-        <div className="card-body text-center py-5">
-          <FaFileAlt
-            size={40}
-            className="text-primary mb-3"
-            style={{ color: orangeColor }}
-          />
-          <h3 className="fw-bold text-dark mb-3">No Quotations Yet</h3>
-          <p className="text-muted mb-4">
-            Start creating professional quotations for your customers. Track proposals and convert them to invoices seamlessly.
-          </p>
-          <div className="d-inline-flex gap-2">
-            <button
-              className="btn text-white d-flex align-items-center"
-              style={{
-                backgroundColor: orangeColor,
-                borderColor: orangeColor,
-              }}
-              onMouseOver={(e) => (e.target.style.backgroundColor = '#e65100')}
-              onMouseOut={(e) => (e.target.style.backgroundColor = orangeColor)}
-            >
-              <FaPlus className="me-2" />
-              Create Quote
-            </button>
-            <button
-              className="btn btn-outline-dark d-flex align-items-center"
-              style={{
-                borderColor: '#495057',
-                color: '#212529',
-              }}
-            >
-              <FaUsers className="me-2" />
-              Add Customer
-            </button>
-          </div>
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          padding: "48px 32px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            backgroundColor: `${orangeColor}10`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 24px",
+          }}
+        >
+          <FaFileAlt size={28} color={orangeColor} />
+        </div>
+        <h3
+          style={{
+            fontSize: "20px",
+            fontWeight: "700",
+            margin: "0 0 12px",
+            color: "#000000",
+          }}
+        >
+          No Quotations Yet
+        </h3>
+        <p
+          style={{
+            fontSize: "15px",
+            color: "#6B7280",
+            maxWidth: "500px",
+            margin: "0 auto 28px",
+          }}
+        >
+          Start creating professional quotations for your customers. Track
+          proposals and convert them to invoices seamlessly.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            onClick={handleCreateQuote}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: orangeColor,
+              color: "#FFFFFF",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#E05A00")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = orangeColor)
+            }
+          >
+            <FaPlus size={14} />
+            Create Quote
+          </button>
+          <button
+            onClick={handleAddCustomer}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: "transparent",
+              color: "#374151",
+              border: `1px solid ${borderColor}`,
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.borderColor = orangeColor)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.borderColor = borderColor)
+            }
+          >
+            <FaUsers size={14} />
+            Add Customer
+          </button>
         </div>
       </div>
     </div>

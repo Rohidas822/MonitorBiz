@@ -1,7 +1,8 @@
-// Register.jsx (Bootstrap Version)
+// src/pages/Register.jsx
 import React, { useState } from 'react';
-import { FaUser, FaBuilding, FaPhone, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheck, FaTimes, FaArrowRight, FaInfoCircle } from 'react-icons/fa';
+import { FaUser, FaBuilding, FaPhone, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import { FiAlertTriangle } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,11 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
+
+  const orangeColor = '#FF6F00';
+  const darkTextColor = '#111827';
+  const grayTextColor = '#374151';
+  const lightBg = '#f9fafb';
 
   // Validation rules
   const validateField = (name, value) => {
@@ -60,7 +66,7 @@ const Register = () => {
         } else if (value.length < 8) {
           error = 'Password must be at least 8 characters';
         } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
-          error = 'Password must contain uppercase, lowercase and numbers';
+          error = 'Must include uppercase, lowercase, and number';
         }
         break;
       case 'confirmPassword':
@@ -81,7 +87,6 @@ const Register = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user types
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -96,7 +101,6 @@ const Register = () => {
     setIsSubmitting(true);
     setFormStatus(null);
     
-    // Validate all fields
     const newErrors = {};
     Object.keys(formData).forEach(field => {
       const error = validateField(field, formData[field]);
@@ -110,26 +114,14 @@ const Register = () => {
     }
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setFormStatus({
         type: 'success',
-        message: 'Account created successfully! Welcome to Monitorbizz.'
+        message: 'Account created successfully! Redirecting to login...'
       });
-      
-      // Reset form after successful submission
-      setFormData({
-        businessName: '',
-        phoneNumber: '',
-        address: '',
-        plan: '',
-        fullName: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
     } catch (error) {
       setFormStatus({
         type: 'error',
@@ -148,50 +140,46 @@ const Register = () => {
     }
   };
 
-  // Plan options
   const plans = [
     { value: '', label: 'Select a plan' },
-    { value: 'basic', label: 'Basic Plan - ₹99/month' },
-    { value: 'pro', label: 'Pro Plan - ₹299/month' },
-    { value: 'enterprise', label: 'Enterprise Plan - ₹999/month' }
+    { value: 'basic', label: 'Basic Plan – ₹99/month' },
+    { value: 'pro', label: 'Pro Plan – ₹299/month' },
+    { value: 'enterprise', label: 'Enterprise Plan – ₹999/month' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 overflow-hidden position-relative">
-      {/* Animated Background */}
-      <div className="position-absolute top-0 start-0 w-100 h-100 overflow-hidden">
-        <div className="position-absolute top-0 end-0 translate-middle-x translate-middle-y w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-500 rounded-circle opacity-20 animate-blob"></div>
-        <div className="position-absolute bottom-0 start-0 translate-middle-x translate-middle-y w-80 h-80 bg-gradient-to-br from-pink-400 to-orange-500 rounded-circle opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="position-absolute top-50 start-50 translate-middle w-80 h-80 bg-gradient-to-br from-green-400 to-teal-500 rounded-circle opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-
-      {/* Main Content */}
-      <div className="position-relative z-10 d-flex align-items-center justify-content-center min-vh-100 p-3">
-        <div className="w-100" style={{ maxWidth: '500px' }}>
-          <div className="bg-white rounded-4 shadow-lg border border-white-20 p-4 p-md-5">
-            {/* Header */}
-            <div className="text-center mb-4">
-              <div className="d-flex justify-content-center mb-3">
-                <div className="d-flex align-items-center justify-content-center w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9M9 9l3 3-3 3m12-3a2 2 0 00-2-2h-2a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2v-6z" />
-                  </svg>
-                </div>
+    <div className="min-vh-100 d-flex align-items-center justify-content-center p-3" style={{ backgroundColor: lightBg, fontFamily: "'Inter', sans-serif" }}>
+      <div className="w-100" style={{ maxWidth: '520px' }}>
+        <div className="bg-white rounded-3 shadow-sm border" style={{ border: '1px solid #e5e7eb' }}>
+          {/* Header */}
+          <div className="text-center p-4 pb-3">
+            <div className="d-flex justify-content-center mb-3">
+              <div 
+                className="d-flex align-items-center justify-content-center rounded-2"
+                style={{ 
+                  width: '60px', 
+                  height: '60px', 
+                  backgroundColor: `${orangeColor}20`,
+                  color: orangeColor 
+                }}
+              >
+                <FaBuilding size={28} />
               </div>
-              <h1 className="h2 fw-bold text-gray-800 mb-1">Monitorbizz</h1>
-              <p className="text-muted small">Start your free trial today</p>
             </div>
+            <h1 className="h3 fw-bold" style={{ color: darkTextColor }}>Monitorbizz</h1>
+            <p className="text-muted small">Create your account to get started</p>
+          </div>
 
-            {/* Form */}
+          <div className="px-4 pb-4">
             <form onSubmit={handleSubmit}>
-              {/* Business Details Section */}
+              {/* Business Details */}
               <div className="mb-4">
-                <h2 className="h5 fw-semibold text-gray-700 mb-3 d-flex align-items-center">
-                  <FaBuilding className="me-2 text-blue-500" /> Business Details
+                <h2 className="h6 fw-semibold text-uppercase text-muted mb-3" style={{ letterSpacing: '0.5px' }}>
+                  Business Details
                 </h2>
-                
+
                 <div className="mb-3">
-                  <label className="form-label">Business Name</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Business Name *</label>
                   <div className="position-relative">
                     <input
                       type="text"
@@ -199,19 +187,20 @@ const Register = () => {
                       value={formData.businessName}
                       onChange={handleChange}
                       placeholder="e.g., Kumar Metal Works"
-                      className={`form-control ${errors.businessName ? 'is-invalid' : ''}`}
+                      className={`form-control py-2 ${errors.businessName ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.businessName ? '#dc3545' : '#d1d5db' }}
                     />
                     {errors.businessName && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  {errors.businessName && <div className="invalid-feedback">{errors.businessName}</div>}
+                  {errors.businessName && <div className="text-danger small mt-1">{errors.businessName}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Phone Number</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Phone Number *</label>
                   <div className="position-relative">
                     <input
                       type="tel"
@@ -219,46 +208,49 @@ const Register = () => {
                       value={formData.phoneNumber}
                       onChange={handleChange}
                       placeholder="9876543210"
-                      className={`form-control ${errors.phoneNumber ? 'is-invalid' : ''}`}
+                      className={`form-control py-2 ${errors.phoneNumber ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.phoneNumber ? '#dc3545' : '#d1d5db' }}
                     />
                     {errors.phoneNumber && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  <small className="form-text text-muted">10-digit mobile number starting with 6-9</small>
-                  {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
+                  <small className="text-muted">10-digit mobile starting with 6–9</small>
+                  {errors.phoneNumber && <div className="text-danger small mt-1">{errors.phoneNumber}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Address</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Address *</label>
                   <div className="position-relative">
                     <textarea
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
                       placeholder="Industrial Area, Phase 2, Mumbai"
-                      rows="3"
-                      className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+                      rows="2"
+                      className={`form-control py-2 ${errors.address ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.address ? '#dc3545' : '#d1d5db' }}
                     />
                     {errors.address && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  {errors.address && <div className="invalid-feedback">{errors.address}</div>}
+                  {errors.address && <div className="text-danger small mt-1">{errors.address}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Choose Your Plan</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Choose Plan *</label>
                   <div className="position-relative">
                     <select
                       name="plan"
                       value={formData.plan}
                       onChange={handleChange}
-                      className={`form-select ${errors.plan ? 'is-invalid' : ''}`}
+                      className={`form-select py-2 ${errors.plan ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.plan ? '#dc3545' : '#d1d5db' }}
                     >
                       {plans.map((plan) => (
                         <option key={plan.value} value={plan.value}>
@@ -268,23 +260,22 @@ const Register = () => {
                     </select>
                     {errors.plan && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  <small className="form-text text-muted">You can upgrade anytime</small>
-                  {errors.plan && <div className="invalid-feedback">{errors.plan}</div>}
+                  {errors.plan && <div className="text-danger small mt-1">{errors.plan}</div>}
                 </div>
               </div>
 
-              {/* Owner Details Section */}
+              {/* Owner Details */}
               <div className="mb-4">
-                <h2 className="h5 fw-semibold text-gray-700 mb-3 d-flex align-items-center">
-                  <FaUser className="me-2 text-blue-500" /> Owner Details
+                <h2 className="h6 fw-semibold text-uppercase text-muted mb-3" style={{ letterSpacing: '0.5px' }}>
+                  Owner Details
                 </h2>
-                
+
                 <div className="mb-3">
-                  <label className="form-label">Full Name</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Full Name *</label>
                   <div className="position-relative">
                     <input
                       type="text"
@@ -292,19 +283,20 @@ const Register = () => {
                       value={formData.fullName}
                       onChange={handleChange}
                       placeholder="Rajesh Kumar"
-                      className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
+                      className={`form-control py-2 ${errors.fullName ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.fullName ? '#dc3545' : '#d1d5db' }}
                     />
                     {errors.fullName && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
+                  {errors.fullName && <div className="text-danger small mt-1">{errors.fullName}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Email Address</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Email Address *</label>
                   <div className="position-relative">
                     <input
                       type="email"
@@ -312,46 +304,56 @@ const Register = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="rajesh@kumarworks.com"
-                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                      className={`form-control py-2 ${errors.email ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.email ? '#dc3545' : '#d1d5db' }}
                     />
                     {errors.email && (
                       <div className="position-absolute end-0 top-50 translate-middle-y text-danger">
-                        <FaTimes />
+                        <FaTimes size={14} />
                       </div>
                     )}
                   </div>
-                  {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                  {errors.email && <div className="text-danger small mt-1">{errors.email}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Password</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Password *</label>
                   <div className="position-relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      placeholder="Minimum 8 characters"
-                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                      placeholder="Min. 8 chars with A, a, 0"
+                      className={`form-control py-2 ${errors.password ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.password ? '#dc3545' : '#d1d5db', paddingRight: '40px' }}
                     />
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility('password')}
-                      className="btn btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                      className="btn"
+                      style={{ 
+                        position: 'absolute', 
+                        right: '10px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        padding: 0,
+                        color: '#6b7280'
+                      }}
                     >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                     </button>
                     {formData.password && !errors.password && (
-                      <div className="position-absolute end-0 top-50 translate-middle-y text-success">
-                        <FaCheck />
+                      <div className="position-absolute end-0 top-50 translate-middle-y" style={{ right: '32px' }}>
+                        <FaCheck size={14} style={{ color: '#10B981' }} />
                       </div>
                     )}
                   </div>
-                  {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                  {errors.password && <div className="text-danger small mt-1">{errors.password}</div>}
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Confirm Password</label>
+                  <label className="form-label fw-medium" style={{ color: grayTextColor }}>Confirm Password *</label>
                   <div className="position-relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
@@ -359,77 +361,99 @@ const Register = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Repeat your password"
-                      className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                      className={`form-control py-2 ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                      style={{ borderColor: errors.confirmPassword ? '#dc3545' : '#d1d5db', paddingRight: '40px' }}
                     />
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility('confirmPassword')}
-                      className="btn btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                      className="btn"
+                      style={{ 
+                        position: 'absolute', 
+                        right: '10px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)',
+                        padding: 0,
+                        color: '#6b7280'
+                      }}
                     >
-                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      {showConfirmPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                     </button>
                     {formData.confirmPassword && !errors.confirmPassword && (
-                      <div className="position-absolute end-0 top-50 translate-middle-y text-success">
-                        <FaCheck />
+                      <div className="position-absolute end-0 top-50 translate-middle-y" style={{ right: '32px' }}>
+                        <FaCheck size={14} style={{ color: '#10B981' }} />
                       </div>
                     )}
                   </div>
-                  {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
+                  {errors.confirmPassword && <div className="text-danger small mt-1">{errors.confirmPassword}</div>}
                 </div>
               </div>
 
               {/* Submit Button */}
-              <div className="mb-3">
+              <div className="d-grid mb-3">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`btn btn-primary w-100 ${isSubmitting ? 'disabled' : ''}`}
+                  className="btn d-flex align-items-center justify-content-center"
+                  style={{
+                    backgroundColor: orangeColor,
+                    borderColor: orangeColor,
+                    color: '#ffffff',
+                    padding: '0.6rem 1.2rem',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseOver={(e) => !isSubmitting && (e.target.style.backgroundColor = '#e65100')}
+                  onMouseOut={(e) => !isSubmitting && (e.target.style.backgroundColor = orangeColor)}
                 >
                   {isSubmitting ? (
-                    <div className="d-flex align-items-center justify-content-center">
+                    <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                       Creating Account...
-                    </div>
+                    </>
                   ) : (
-                    <div className="d-flex align-items-center justify-content-center">
+                    <>
                       <FaCheck className="me-2" /> Create My Account
-                    </div>
+                    </>
                   )}
                 </button>
               </div>
 
               {/* Status Message */}
               {formStatus && (
-                <div className={`alert ${formStatus.type === 'success' ? 'alert-success' : 'alert-danger'} mt-3`} role="alert">
-                  {formStatus.type === 'success' ? (
-                    <div className="d-flex align-items-center">
-                      <FaCheck className="me-2" /> {formStatus.message}
-                    </div>
-                  ) : (
-                    <div className="d-flex align-items-center">
-                      <FiAlertTriangle className="me-2" /> {formStatus.message}
-                    </div>
-                  )}
+                <div 
+                  className={`alert alert-${formStatus.type === 'success' ? 'success' : 'danger'} p-3 rounded-2 mb-3`}
+                  role="alert"
+                >
+                  <div className="d-flex align-items-center">
+                    {formStatus.type === 'success' ? (
+                      <FaCheck className="me-2 text-success" />
+                    ) : (
+                      <FiAlertTriangle className="me-2 text-danger" />
+                    )}
+                    <span>{formStatus.message}</span>
+                  </div>
                 </div>
               )}
 
               {/* Login Link */}
-              <div className="text-center mt-3">
-                <p className="text-muted small">
+              <div className="text-center mt-2">
+                <p className="mb-0 small" style={{ color: grayTextColor }}>
                   Already have an account?{' '}
-                  <a href="/login" className="text-decoration-none text-primary fw-medium">
+                  <Link to="/login" className="fw-medium" style={{ color: orangeColor, textDecoration: 'none' }}>
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </form>
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div className="position-absolute bottom-0 start-0 end-0 text-center text-xs text-gray-500 py-3">
-        © {new Date().getFullYear()} Monitorbizz. All rights reserved.
+        {/* Footer */}
+        <div className="text-center mt-4 small" style={{ color: '#6b7280' }}>
+          © {new Date().getFullYear()} Monitorbizz. All rights reserved.
+        </div>
       </div>
     </div>
   );

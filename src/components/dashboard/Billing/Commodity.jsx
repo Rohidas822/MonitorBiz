@@ -1,5 +1,6 @@
 // Commodity.jsx
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaUserCircle,
@@ -11,69 +12,130 @@ import {
   FaEye,
   FaEdit,
   FaTrash,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 const Commodity = () => {
+  const navigate = useNavigate();
+
   // Mock data
   const commodities = [
     {
       id: 1,
-      name: 'Consulting Hour',
-      type: 'Service',
-      supplier: 'Primary Supplier',
-      stock: 'N/A',
-      reorderPoint: '50 hour',
-      unitCost: '₹100.00',
-      status: 'Active',
+      name: "Consulting Hour",
+      type: "Service",
+      supplier: "Primary Supplier",
+      stock: "N/A",
+      reorderPoint: "50 hour",
+      unitCost: "₹100.00",
+      status: "Active",
     },
   ];
 
   const stats = [
-    { title: 'Total Commodities', value: 1, icon: <FaBox /> },
-    { title: 'Active Commodities', value: 1, icon: <FaCheck /> },
-    { title: 'Low Stock', value: 0, icon: <FaExclamationTriangle /> },
-    { title: 'Vendors', value: 0, icon: <FaTruck /> },
+    {
+      title: "Total Commodities",
+      value: 1,
+      icon: <FaBox color="#FF6F00" size={20} />,
+    },
+    {
+      title: "Active Commodities",
+      value: 1,
+      icon: <FaCheck color="#FF6F00" size={20} />,
+    },
+    {
+      title: "Low Stock",
+      value: 0,
+      icon: <FaExclamationTriangle color="#FF6F00" size={20} />,
+    },
+    { title: "Vendors", value: 0, icon: <FaTruck color="#FF6F00" size={20} /> },
   ];
 
-  // Custom orange color for consistency
-  const orangeColor = '#FF6F00';
+  const orangeColor = "#FF6F00";
+  const darkTextColor = "#111827";
+  const lightGray = "#F3F4F6";
+  const borderColor = "#E5E7EB";
+  const backgroundColor = "#F9FAFB";
 
   return (
-    <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa' }}>
+    <div
+      style={{
+        padding: "24px",
+        backgroundColor: backgroundColor,
+        minHeight: "100vh",
+        fontFamily:
+          '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        color: darkTextColor,
+      }}
+    >
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="h4 fw-bold text-dark">Commodities</h1>
-        <div className="d-flex align-items-center">
-          <div className="position-relative me-3">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+          flexWrap: "wrap",
+          gap: "16px",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "24px",
+            fontWeight: "700",
+            margin: 0,
+            color: "#000000",
+          }}
+        >
+          Commodities
+        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          {/* Search */}
+          <div style={{ position: "relative", width: "220px" }}>
+            <FaSearch
+              style={{
+                position: "absolute",
+                left: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#6B7280",
+                pointerEvents: "none",
+              }}
+            />
             <input
               type="text"
               placeholder="Search..."
-              className="form-control ps-5"
               style={{
-                borderColor: '#ced4da',
-                width: '220px',
-              }}
-            />
-            <FaSearch
-              className="position-absolute"
-              style={{
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#6c757d',
+                width: "100%",
+                paddingLeft: "36px",
+                paddingRight: "12px",
+                paddingTop: "8px",
+                paddingBottom: "8px",
+                borderRadius: "8px",
+                border: `1px solid ${borderColor}`,
+                fontSize: "14px",
+                color: darkTextColor,
+                outline: "none",
               }}
             />
           </div>
-          <div className="d-flex align-items-center text-dark">
-            <FaUserCircle className="me-2" />
+
+          {/* User Info */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "14px",
+            }}
+          >
+            <FaUserCircle size={20} color="#4B5563" />
             <span>Rohidas Raghu Lakade</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              className="bi bi-chevron-down ms-1"
+              width="14"
+              height="14"
               viewBox="0 0 16 16"
+              fill="#6B7280"
             >
               <path
                 fillRule="evenodd"
@@ -85,134 +147,340 @@ const Commodity = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="row g-4 mb-4">
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "16px",
+          marginBottom: "24px",
+        }}
+      >
         {stats.map((stat, index) => (
-          <div className="col-6 col-md-3" key={index}>
+          <div
+            key={index}
+            style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: "10px",
+              padding: "16px",
+              display: "flex",
+              alignItems: "center",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              borderLeft: `4px solid ${orangeColor}`,
+            }}
+          >
             <div
-              className="card h-100 border-start"
-              style={{ borderLeftColor: orangeColor }}
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                backgroundColor: `${orangeColor}10`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: "12px",
+              }}
             >
-              <div className="card-body d-flex align-items-center">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center me-3"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: `${orangeColor}20`,
-                    color: orangeColor,
-                  }}
-                >
-                  {stat.icon}
-                </div>
-                <div>
-                  <p className="text-muted mb-1 small">{stat.title}</p>
-                  <h5 className="mb-0 fw-bold text-dark">{stat.value}</h5>
-                </div>
-              </div>
+              {stat.icon}
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "#6B7280",
+                  margin: "0 0 4px 0",
+                }}
+              >
+                {stat.title}
+              </p>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  margin: 0,
+                  color: "#000000",
+                }}
+              >
+                {stat.value}
+              </h3>
             </div>
           </div>
         ))}
       </div>
 
       {/* Main Table Section */}
-      <div className="card shadow-sm">
-        <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            padding: "16px 24px",
+            borderBottom: `1px solid ${borderColor}`,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "16px",
+          }}
+        >
           <div>
-            <h2 className="h5 fw-bold text-dark mb-1">Commodities</h2>
-            <small className="text-muted">Home &gt; Commodities</small>
+            <h2
+              style={{
+                fontSize: "18px",
+                fontWeight: "700",
+                margin: "0 0 4px 0",
+                color: "#000000",
+              }}
+            >
+              Commodities
+            </h2>
+            <p style={{ fontSize: "13px", color: "#6B7280", margin: 0 }}>
+              Home &gt; Commodities
+            </p>
           </div>
           <button
-            className="btn text-white d-flex align-items-center"
+            onClick={() => navigate("/dashboard/billing/commodity/new")}
             style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "8px 16px",
+              borderRadius: "8px",
               backgroundColor: orangeColor,
-              borderColor: orangeColor,
+              color: "#FFFFFF",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = '#e65100')}
-            onMouseOut={(e) => (e.target.style.backgroundColor = orangeColor)}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#E05A00")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = orangeColor)
+            }
           >
-            <FaPlus className="me-2" />
+            <FaPlus size={14} />
             New Commodity
           </button>
         </div>
-        <div className="card-body p-0">
-          <div className="table-responsive">
-            <table className="table table-hover mb-0">
-              <thead className="table-light">
-                <tr>
-                  <th className="ps-4">COMMODITY</th>
-                  <th>SUPPLIER</th>
-                  <th>STOCK</th>
-                  <th>
-                    REORDER POINT
-                    <span className="ms-1 text-muted" style={{ fontSize: '0.75em' }}>
-                      ?
-                    </span>
+
+        {/* Table */}
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "14px",
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: "#F9FAFB", textAlign: "left" }}>
+                {[
+                  "COMMODITY",
+                  "SUPPLIER",
+                  "STOCK",
+                  "REORDER POINT",
+                  "UNIT COST",
+                  "STATUS",
+                  "ACTIONS",
+                ].map((header, idx) => (
+                  <th
+                    key={header}
+                    style={{
+                      padding:
+                        idx === 0
+                          ? "12px 24px"
+                          : idx === 6
+                          ? "12px 24px"
+                          : "12px 16px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      color: "#6B7280",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {header}
+                    {header === "REORDER POINT" && (
+                      <span
+                        style={{
+                          marginLeft: "4px",
+                          fontSize: "0.75em",
+                          color: "#9CA3AF",
+                        }}
+                      >
+                        (?)
+                      </span>
+                    )}
                   </th>
-                  <th>UNIT COST</th>
-                  <th>STATUS</th>
-                  <th className="pe-4">ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commodities.map((item) => (
-                  <tr key={item.id}>
-                    <td className="ps-4 align-middle">
-                      <div className="d-flex align-items-center">
-                        <span className="me-2">{item.name}</span>
-                        <span
-                          className="badge rounded-pill"
-                          style={{
-                            backgroundColor: '#e1f5fe',
-                            color: '#01579b',
-                          }}
-                        >
-                          {item.type}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="align-middle">{item.supplier}</td>
-                    <td className="align-middle">
-                      <span
-                        className="badge rounded-pill"
-                        style={{
-                          backgroundColor: '#e1f5fe',
-                          color: '#01579b',
-                        }}
-                      >
-                        {item.stock}
-                      </span>
-                    </td>
-                    <td className="align-middle">{item.reorderPoint}</td>
-                    <td className="align-middle">{item.unitCost}</td>
-                    <td className="align-middle">
-                      <span
-                        className="badge rounded-pill"
-                        style={{
-                          backgroundColor: '#e8f5e9',
-                          color: '#2e7d32',
-                        }}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="pe-4 align-middle">
-                      <div className="d-flex">
-                        <button className="btn p-1 text-primary">
-                          <FaEye />
-                        </button>
-                        <button className="btn p-1 text-warning">
-                          <FaEdit />
-                        </button>
-                        <button className="btn p-1 text-danger">
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {commodities.map((item) => (
+                <tr
+                  key={item.id}
+                  style={{
+                    borderBottom: `1px solid ${borderColor}`,
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#FCFCFD")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#FFFFFF")
+                  }
+                >
+                  <td style={{ padding: "16px 24px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                      }}
+                    >
+                      <span style={{ fontWeight: "600", color: "#000000" }}>
+                        {item.name}
+                      </span>
+                      <span
+                        style={{
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          backgroundColor: "#E1F5FE",
+                          color: "#01579B",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {item.type}
+                      </span>
+                    </div>
+                  </td>
+                  <td style={{ padding: "16px 16px", color: "#4B5563" }}>
+                    {item.supplier}
+                  </td>
+                  <td style={{ padding: "16px 16px" }}>
+                    <span
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: "16px",
+                        backgroundColor: "#E1F5FE",
+                        color: "#01579B",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {item.stock}
+                    </span>
+                  </td>
+                  <td style={{ padding: "16px 16px", color: "#4B5563" }}>
+                    {item.reorderPoint}
+                  </td>
+                  <td
+                    style={{
+                      padding: "16px 16px",
+                      color: "#4B5563",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {item.unitCost}
+                  </td>
+                  <td style={{ padding: "16px 16px" }}>
+                    <span
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: "16px",
+                        backgroundColor: "#ECFDF5",
+                        color: "#059669",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: "16px 24px" }}>
+                    <div style={{ display: "flex", gap: "12px" }}>
+                      {/* View */}
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/dashboard/billing/commodity/view/${item.id}`
+                          )
+                        }
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#3B82F6",
+                          fontSize: "16px",
+                          padding: "4px",
+                          borderRadius: "4px",
+                        }}
+                        aria-label="View commodity"
+                      >
+                        <FaEye />
+                      </button>
+
+                      {/* Edit */}
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/dashboard/billing/commodity/edit/${item.id}`
+                          )
+                        }
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#F59E0B",
+                          fontSize: "16px",
+                          padding: "4px",
+                          borderRadius: "4px",
+                        }}
+                        aria-label="Edit commodity"
+                      >
+                        <FaEdit />
+                      </button>
+
+                      {/* Delete (optional: add confirmation) */}
+                      <button
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this commodity?"
+                            )
+                          ) {
+                            // TODO: Call delete API here
+                            alert("Commodity deleted!");
+                            // Optionally refresh list or navigate
+                          }
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#EF4444",
+                          fontSize: "16px",
+                          padding: "4px",
+                          borderRadius: "4px",
+                        }}
+                        aria-label="Delete commodity"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
