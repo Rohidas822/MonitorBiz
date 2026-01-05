@@ -1,5 +1,5 @@
 // src/components/dashboard/Billing/NewCommodity.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaBox,
@@ -15,19 +15,35 @@ const NewCommodity = () => {
   const borderColor = '#D1D5DB';
   const backgroundColor = '#F9FAFB';
 
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     commodityName: '',
     type: 'Good (Physical Product)',
     hsnCode: '',
     sku: '',
     barcode: '',
-    productType: 'Product',
-    unit: 'Kilogram (kg)',
+    productType: 'Service',
+    unit: 'kg',
     unitPrice: '',
     gstRate: '18',
     category: '',
     description: '',
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  // Auto-generate SKU and Barcode if empty
+  const generateSKU = (name, type) => {
+    const prefix = type === 'Service' ? 'SRV' : 'PRD';
+    const cleanName = name.replace(/\s+/g, '').substring(0, 5).toUpperCase();
+    const randomNum = Math.floor(10000 + Math.random() * 90000);
+    return `${prefix}${cleanName}${randomNum}`;
+  };
+
+  const generateBarcode = () => {
+    return Math.floor(1000000000000 + Math.random() * 9000000000000).toString();
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,20 +51,67 @@ const NewCommodity = () => {
       ...prev,
       [name]: value,
     }));
+    if (error) setError(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form Data Submitted:', formData);
-    alert('Commodity added successfully!');
-    navigate('/dashboard/billing/commodity');
+    
+    // Required field validation
+    if (!formData.commodityName || !formData.unit || !formData.unitPrice) {
+      setError('Please fill in all required fields (Commodity Name, Unit, and Unit Price)');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Auto-generate SKU and Barcode if empty
+      const finalSKU = formData.sku || generateSKU(formData.commodityName, formData.type);
+      const finalBarcode = formData.barcode || generateBarcode();
+      
+      const commodityData = {
+        ...formData,
+        sku: finalSKU,
+        barcode: finalBarcode,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        unitPrice: parseFloat(formData.unitPrice),
+        gstRate: parseFloat(formData.gstRate) || 0,
+      };
+
+      const response = await fetch('http://localhost:3000/commodities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commodityData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create commodity');
+      }
+
+      const createdCommodity = await response.json();
+      console.log('Commodity created:', createdCommodity);
+      setSuccess(true);
+      
+      setTimeout(() => {
+        navigate('/dashboard/billing/commodity');
+      }, 1000);
+    } catch (err) {
+      console.error('Error creating commodity:', err);
+      setError('Failed to create commodity. Please check if JSON Server is running on port 3000.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
     navigate('/dashboard/billing/commodity');
   };
 
-  // Reusable input style
   const inputStyle = (isFocused = false) => ({
     width: '100%',
     padding: '10px 12px',
@@ -63,7 +126,7 @@ const NewCommodity = () => {
   return (
     <div
       style={{
-        padding: '24px',
+        padding: '20px',
         backgroundColor: backgroundColor,
         minHeight: '100vh',
         fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -138,9 +201,46 @@ const NewCommodity = () => {
             Add New Commodity
           </h2>
         </div>
-        <div style={{ padding: '28px' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px', alignItems: 'start' }}>
+        <div style={{ padding: '20px' }}>
+          {error && (
+            <div
+              style={{
+                backgroundColor: "#FEF2F2",
+                border: "1px solid #FECACA",
+                color: "#DC2626",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div
+              style={{
+                backgroundColor: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                color: "#059669",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+              }}
+            >
+              Commodity added successfully! Redirecting...
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Responsive Grid */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+              gap: '24px' 
+            }}>
               {/* Left Column */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* Commodity Name */}
@@ -217,6 +317,9 @@ const NewCommodity = () => {
                     onFocus={(e) => (e.target.style.borderColor = orangeColor)}
                     onBlur={(e) => (e.target.style.borderColor = borderColor)}
                   />
+                  <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Leave empty to auto-generate
+                  </p>
                 </div>
 
                 {/* Unit */}
@@ -241,12 +344,14 @@ const NewCommodity = () => {
                     onFocus={(e) => (e.target.style.borderColor = orangeColor)}
                     onBlur={(e) => (e.target.style.borderColor = borderColor)}
                   >
-                    <option value="Kilogram (kg)">Kilogram (kg)</option>
-                    <option value="Gram (g)">Gram (g)</option>
-                    <option value="Liter (L)">Liter (L)</option>
-                    <option value="Piece">Piece</option>
-                    <option value="Box">Box</option>
-                    <option value="Unit">Unit</option>
+                    <option value="kg">Kilogram (kg)</option>
+                    <option value="g">Gram (g)</option>
+                    <option value="L">Liter (L)</option>
+                    <option value="m">Meter (m)</option>
+                    <option value="piece">Piece</option>
+                    <option value="box">Box</option>
+                    <option value="dozen">Dozen</option>
+                    <option value="ton">Ton</option>
                   </select>
                 </div>
 
@@ -268,6 +373,7 @@ const NewCommodity = () => {
                     name="gstRate"
                     min="0"
                     max="100"
+                    step="0.01"
                     placeholder="18"
                     value={formData.gstRate}
                     onChange={handleChange}
@@ -330,6 +436,9 @@ const NewCommodity = () => {
                     onFocus={(e) => (e.target.style.borderColor = orangeColor)}
                     onBlur={(e) => (e.target.style.borderColor = borderColor)}
                   />
+                  <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                    Leave empty to auto-generate
+                  </p>
                 </div>
 
                 {/* Product Type */}
@@ -353,9 +462,8 @@ const NewCommodity = () => {
                     onFocus={(e) => (e.target.style.borderColor = orangeColor)}
                     onBlur={(e) => (e.target.style.borderColor = borderColor)}
                   >
-                    <option value="Product">Product</option>
-                    <option value="Raw Material">Raw Material</option>
-                    <option value="Finished Good">Finished Good</option>
+                    <option value="Service">Service</option>
+                    <option value="Bundle">Bundle</option>
                   </select>
                 </div>
 
@@ -444,7 +552,13 @@ const NewCommodity = () => {
             </div>
 
             {/* Action Buttons */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end', 
+              gap: '12px', 
+              marginTop: '12px',
+              flexWrap: 'wrap'
+            }}>
               <button
                 type="button"
                 onClick={handleCancel}
@@ -457,6 +571,7 @@ const NewCommodity = () => {
                   fontSize: '14px',
                   fontWeight: '600',
                   cursor: 'pointer',
+                  minWidth: '100px',
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#DC2626')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#4B5563')}
@@ -465,24 +580,29 @@ const NewCommodity = () => {
               </button>
               <button
                 type="submit"
+                disabled={loading}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   padding: '10px 20px',
                   borderRadius: '8px',
-                  background: orangeColor,
+                  background: loading ? '#9CA3AF' : orangeColor,
                   color: '#FFFFFF',
                   border: 'none',
                   fontSize: '14px',
                   fontWeight: '600',
-                  cursor: 'pointer',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  minWidth: '140px',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#E05A00')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = orangeColor)}
+                onMouseEnter={(e) => {
+                  if (!loading) e.currentTarget.style.backgroundColor = '#E05A00';
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) e.currentTarget.style.backgroundColor = orangeColor;
+                }}
               >
-                <FaPlus size={14} />
-                Add Commodity
+                {loading ? 'Adding...' : <><FaPlus size={14} /> Add Commodity</>}
               </button>
             </div>
           </form>

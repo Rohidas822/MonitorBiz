@@ -1,5 +1,5 @@
 // src/components/dashboard/Billing/Customer.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaHome,
@@ -20,7 +20,31 @@ import {
 
 const Customer = () => {
   const navigate = useNavigate();
-  const sampleCustomerId = '213';
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch customers from JSON Server
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/customers');
+        if (!response.ok) {
+          throw new Error('Failed to fetch customers');
+        }
+        const data = await response.json();
+        setCustomers(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching customers:', err);
+        setError('Failed to load customers. Please check if JSON Server is running.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
 
   // Reusable hover effect style generator
   const actionButtonStyle = (isHovered = false) => ({
@@ -38,6 +62,140 @@ const Customer = () => {
     transition: 'all 0.2s',
     boxShadow: isHovered ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
   });
+
+  // Get customer initials for avatar
+  const getInitials = (name) => {
+    if (!name) return '??';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  // Format phone number
+  const formatPhone = (phone) => {
+    if (!phone) return 'N/A';
+    // Simple formatting: XXXXX XXXXX
+    return phone.replace(/(\d{5})(\d+)/, '$1 $2');
+  };
+
+  // Get business type display
+  const getBusinessType = (customer) => {
+    return customer.customerType === 'business' ? 'Business' : 'Individual';
+  };
+
+  // Get GST status display
+  const getGstStatus = (customer) => {
+    return customer.gst ? 'With GST' : 'No GST';
+  };
+
+  // Get location display
+  const getLocation = (customer) => {
+    const city = customer.city || 'N/A';
+    const state = customer.state || 'N/A';
+    return { city, state };
+  };
+
+  // Calculate metrics
+  const totalCustomers = customers.length;
+  const activeCustomers = customers.length; // All customers are active in this simple setup
+  const withGst = customers.filter(c => c.gst).length;
+  const businessType = customers.filter(c => c.customerType === 'business').length;
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          fontFamily: '"Inter", sans-serif',
+          backgroundColor: '#F9FAFB',
+          minHeight: '100vh',
+          padding: '20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            borderRadius: '50%', 
+            border: '3px solid #FF6B00', 
+            borderTopColor: 'transparent',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p style={{ color: '#6B7280' }}>Loading customers...</p>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          fontFamily: '"Inter", sans-serif',
+          backgroundColor: '#F9FAFB',
+          minHeight: '100vh',
+          padding: '20px',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            padding: '48px 32px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: '#FEF2F2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px',
+            }}
+          >
+            <div style={{ color: '#EF4444', fontSize: '28px' }}>!</div>
+          </div>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 12px', color: '#000000' }}>
+            Error Loading Customers
+          </h3>
+          <p style={{ fontSize: '15px', color: '#6B7280', margin: '0 0 28px', maxWidth: '500px' }}>
+            {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '8px',
+              backgroundColor: '#FF6B00',
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -160,7 +318,7 @@ const Customer = () => {
                   backgroundColor: '#10B981',
                 }}
               ></div>
-              1 Total
+              {totalCustomers} Total
             </div>
 
             <button
@@ -198,10 +356,10 @@ const Customer = () => {
           }}
         >
           {[
-            { title: 'Total Customers', value: '1', icon: <FaUsers color="#3B82F6" size={24} />, linkText: 'All contacts', linkColor: '#3B82F6' },
-            { title: 'Active Customers', value: '1', icon: <FaCheckCircle color="#10B981" size={24} />, linkText: 'Currently active', linkColor: '#10B981' },
-            { title: 'With GST', value: '0', icon: <FaFileAlt color="#8B5CF6" size={24} />, linkText: 'GST registered', linkColor: '#8B5CF6' },
-            { title: 'Business Type', value: '1', icon: <FaBuilding color="#F59E0B" size={24} />, linkText: 'B2B customers', linkColor: '#F59E0B' },
+            { title: 'Total Customers', value: totalCustomers, icon: <FaUsers color="#3B82F6" size={24} />, linkText: 'All contacts', linkColor: '#3B82F6' },
+            { title: 'Active Customers', value: activeCustomers, icon: <FaCheckCircle color="#10B981" size={24} />, linkText: 'Currently active', linkColor: '#10B981' },
+            { title: 'With GST', value: withGst, icon: <FaFileAlt color="#8B5CF6" size={24} />, linkText: 'GST registered', linkColor: '#8B5CF6' },
+            { title: 'Business Type', value: businessType, icon: <FaBuilding color="#F59E0B" size={24} />, linkText: 'B2B customers', linkColor: '#F59E0B' },
           ].map((card, index) => (
             <div
               key={index}
@@ -278,138 +436,187 @@ const Customer = () => {
           </div>
 
           {/* Table Body */}
-          <div style={{ padding: '0' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  {['CUSTOMER', 'CONTACT INFO', 'LOCATION', 'BUSINESS', 'STATUS', 'ACTIONS'].map((header) => (
-                    <th
-                      key={header}
-                      style={{
-                        textAlign: 'left',
-                        padding: '12px 16px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: '#6B7280',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  <td style={{ padding: '16px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div
+          {customers.length === 0 ? (
+            <div style={{ padding: '48px 32px', textAlign: 'center' }}>
+              <div
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FFF5EB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 24px',
+                }}
+              >
+                <FaUser size={28} color="#FF6B00" />
+              </div>
+              <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 12px', color: '#000000' }}>
+                No Customers Yet
+              </h3>
+              <p style={{ fontSize: '15px', color: '#6B7280', margin: '0 0 28px' }}>
+                Start by creating your first customer to manage relationships and contacts.
+              </p>
+              <button
+                onClick={() => navigate('/dashboard/billing/customer/create')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  backgroundColor: '#FF6B00',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                }}
+              >
+                <FaPlus size={14} />
+                Create Customer
+              </button>
+            </div>
+          ) : (
+            <div style={{ padding: '0' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
+                    {['CUSTOMER', 'CONTACT INFO', 'LOCATION', 'BUSINESS', 'STATUS', 'ACTIONS'].map((header) => (
+                      <th
+                        key={header}
                         style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          backgroundColor: '#FFF5EB',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '14px',
+                          textAlign: 'left',
+                          padding: '12px 16px',
+                          fontSize: '12px',
                           fontWeight: '600',
-                          color: '#FF6B00',
+                          color: '#6B7280',
+                          textTransform: 'uppercase',
                         }}
                       >
-                        Sa
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: '600', color: '#000000' }}>Sample Client</div>
-                        <div style={{ fontSize: '12px', color: '#6B7280' }}>ID: {sampleCustomerId}</div>
-                      </div>
-                    </div>
-                  </td>
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
 
-                  <td style={{ padding: '16px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                      <FaPhone size={12} style={{ color: '#6B7280' }} />
-                      <span>9876543210</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <FaEnvelope size={12} style={{ color: '#6B7280' }} />
-                      <span>client@example.com</span>
-                    </div>
-                  </td>
+                <tbody>
+                  {customers.map((customer) => {
+                    const { city, state } = getLocation(customer);
+                    return (
+                      <tr key={customer.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                backgroundColor: '#FFF5EB',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                color: '#FF6B00',
+                              }}
+                            >
+                              {getInitials(customer.name)}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: '600', color: '#000000' }}>{customer.name || 'N/A'}</div>
+                              <div style={{ fontSize: '12px', color: '#6B7280' }}>ID: {customer.id}</div>
+                            </div>
+                          </div>
+                        </td>
 
-                  <td style={{ padding: '16px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                      <FaMapMarkerAlt size={12} style={{ color: '#6B7280' }} />
-                      <span>Mumbai</span>
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#6B7280' }}>Maharashtra</div>
-                  </td>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                            <FaPhone size={12} style={{ color: '#6B7280' }} />
+                            <span>{formatPhone(customer.phone)}</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <FaEnvelope size={12} style={{ color: '#6B7280' }} />
+                            <span>{customer.email || 'N/A'}</span>
+                          </div>
+                        </td>
 
-                  <td style={{ padding: '16px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                      <FaBuilding size={12} style={{ color: '#6B7280' }} />
-                      <span>Business</span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        backgroundColor: '#F3F4F6',
-                        display: 'inline-block',
-                        color: '#6B7280',
-                      }}
-                    >
-                      No GST
-                    </div>
-                  </td>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                            <FaMapMarkerAlt size={12} style={{ color: '#6B7280' }} />
+                            <span>{city}</span>
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#6B7280' }}>{state}</div>
+                        </td>
 
-                  <td style={{ padding: '16px 16px' }}>
-                    <div
-                      style={{
-                        padding: '4px 12px',
-                        borderRadius: '16px',
-                        backgroundColor: '#ECFDF5',
-                        color: '#059669',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        display: 'inline-block',
-                      }}
-                    >
-                      Active
-                    </div>
-                  </td>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                            <FaBuilding size={12} style={{ color: '#6B7280' }} />
+                            <span>{getBusinessType(customer)}</span>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '12px',
+                              padding: '2px 8px',
+                              borderRadius: '12px',
+                              backgroundColor: '#F3F4F6',
+                              display: 'inline-block',
+                              color: '#6B7280',
+                            }}
+                          >
+                            {getGstStatus(customer)}
+                          </div>
+                        </td>
 
-                  <td style={{ padding: '16px 16px' }}>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      {/* View Button */}
-                      <button
-                        onClick={() => navigate(`/dashboard/billing/customer/view/${sampleCustomerId}`)}
-                        style={actionButtonStyle()}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#4B5563')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
-                      >
-                        <FaEye size={14} />
-                        View
-                      </button>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div
+                            style={{
+                              padding: '4px 12px',
+                              borderRadius: '16px',
+                              backgroundColor: '#ECFDF5',
+                              color: '#059669',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              display: 'inline-block',
+                            }}
+                          >
+                            Active
+                          </div>
+                        </td>
 
-                      {/* Edit Button */}
-                      <button
-                        onClick={() => navigate(`/dashboard/billing/customer/edit/${sampleCustomerId}`)}
-                        style={actionButtonStyle()}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#4B5563')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
-                      >
-                        <FaEdit size={14} />
-                        Edit
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                        <td style={{ padding: '16px 16px' }}>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {/* View Button */}
+                            <button
+                              onClick={() => navigate(`/dashboard/billing/customer/view/${customer.id}`)}
+                              style={actionButtonStyle()}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = '#4B5563')}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
+                            >
+                              <FaEye size={14} />
+                              View
+                            </button>
+
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => navigate(`/dashboard/billing/customer/edit/${customer.id}`)}
+                              style={actionButtonStyle()}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = '#4B5563')}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
+                            >
+                              <FaEdit size={14} />
+                              Edit
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

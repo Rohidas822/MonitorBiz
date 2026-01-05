@@ -1,4 +1,4 @@
-
+// src/components/dashboard/Dashboard.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FaSearch,
@@ -13,8 +13,9 @@ import {
   FaInfoCircle,
   FaEllipsisV,
   FaMoneyBillWave,
-  FaBoxOpen,
-  FaUserFriends,
+  FaHardHat,
+  FaIndustry,
+  FaPlus,
 } from 'react-icons/fa';
 
 const Dashboard = () => {
@@ -28,24 +29,16 @@ const Dashboard = () => {
   const lightGray = '#F3F4F6';
   const borderColor = '#E5E7EB';
 
-  // Inject keyframes once on mount
+  // Inject keyframes once on mount (simplified)
   useEffect(() => {
     const styleId = 'dashboard-inline-animations';
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
       style.textContent = `
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0); }
-          50% { transform: translateY(-16px) rotate(8deg); }
-        }
         @keyframes pulse {
           0%, 100% { opacity: 0.8; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.1); }
-        }
-        @keyframes glowPulse {
-          from { box-shadow: 0 0 8px rgba(255,255,255,0.3); }
-          to { box-shadow: 0 0 20px rgba(255,255,255,0.6); }
         }
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -55,7 +48,6 @@ const Dashboard = () => {
       document.head.appendChild(style);
     }
 
-    // Scroll-triggered animation for banner
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -116,12 +108,14 @@ const Dashboard = () => {
     time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
   };
 
+  const completedSteps = setupProgress.filter(step => step.completed).length;
+  const progressPercent = Math.round((completedSteps / setupProgress.length) * 100);
+
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     window.location.href = '/login';
   };
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = () => setIsMenuOpen(false);
     if (isMenuOpen) {
@@ -131,13 +125,10 @@ const Dashboard = () => {
   }, [isMenuOpen]);
 
   return (
-    <div className="min-vh-100 bg-light" style={{ backgroundColor: '#ffffffff', position: 'absolute', width: '81%', top: "20px", }}>
+    <div className="min-vh-100" style={{ backgroundColor: '#F9FAFB', position: 'absolute', width: '81%', top: "20px", fontFamily: '"Inter", sans-serif' }}>
       {/* Header */}
-      <header
-        className="bg- shadow-sm"
-        style={{ borderBottom: `1px solid ${borderColor}`, }}
-      >
-        <div className="container-fluid px-4 py-3 d-flex justify-content-between align-items-center" >
+      <header style={{ borderBottom: `1px solid ${borderColor}`, backgroundColor: '#FFFFFF' }}>
+        <div className="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
             <h1 className="h5 fw-bold mb-0" style={{ color: orangeColor }}>
               Monitorbizz
@@ -160,6 +151,7 @@ const Dashboard = () => {
                   borderRadius: '20px',
                   border: `1px solid ${borderColor}`,
                   fontSize: '0.875rem',
+                  color: darkTextColor,
                 }}
               />
               <FaSearch
@@ -217,7 +209,7 @@ const Dashboard = () => {
                       className="dropdown-item d-flex align-items-center py-2 px-3"
                       style={{ cursor: 'pointer', color: darkTextColor }}
                     >
-                      <FaUsers className="me-2" style={{ color: grayTextColor }} /> Team
+                      <FaHardHat className="me-2" style={{ color: grayTextColor }} /> Team
                     </div>
                     <button
                       onClick={handleLogout}
@@ -242,7 +234,7 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div className="container-fluid px-4 py-4" style={{ maxWidth: '1400px' }}>
-        {/* Welcome Banner - ENHANCED WITH ANIMATIONS */}
+        {/* Welcome Banner */}
         <div
           ref={bannerRef}
           className="rounded-4 p-5 mb-4 text-white position-relative overflow-hidden"
@@ -253,60 +245,12 @@ const Dashboard = () => {
             transform: 'translateY(20px)',
           }}
         >
-          {/* Floating Animated Icons (Live Background) */}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
-            <FaChartLine
-              style={{
-                position: 'absolute',
-                top: '10%',
-                left: '5%',
-                fontSize: '2rem',
-                color: 'rgba(255,255,255,0.12)',
-                animation: 'float 15s infinite ease-in-out',
-                animationDelay: '0s',
-              }}
-            />
-            <FaMoneyBillWave
-              style={{
-                position: 'absolute',
-                top: '30%',
-                right: '10%',
-                fontSize: '1.8rem',
-                color: 'rgba(255,255,255,0.12)',
-                animation: 'float 15s infinite ease-in-out',
-                animationDelay: '-3s',
-              }}
-            />
-            <FaBoxOpen
-              style={{
-                position: 'absolute',
-                bottom: '20%',
-                left: '15%',
-                fontSize: '1.6rem',
-                color: 'rgba(255,255,255,0.12)',
-                animation: 'float 15s infinite ease-in-out',
-                animationDelay: '-7s',
-              }}
-            />
-            <FaUserFriends
-              style={{
-                position: 'absolute',
-                bottom: '35%',
-                right: '18%',
-                fontSize: '1.7rem',
-                color: 'rgba(255,255,255,0.12)',
-                animation: 'float 15s infinite ease-in-out',
-                animationDelay: '-11s',
-              }}
-            />
-          </div>
-
           <div className="row align-items-center position-relative" style={{ zIndex: 1 }}>
             <div className="col-lg-8">
               <h2 className="h3 fw-bold mb-2" style={{ textShadow: '0 0 8px rgba(255,255,255,0.6)' }}>
                 Welcome back, {user.name}!
               </h2>
-              <p className="mb-3 opacity-90">{user.business} • {user.role}</p>
+              <p className="mb-3 opacity-90" style={{ lineHeight: 1.5 }}>{user.business} • {user.role}</p>
               <div className="d-flex align-items-center mb-3">
                 <FaClock
                   style={{
@@ -341,7 +285,6 @@ const Dashboard = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   backdropFilter: 'blur(4px)',
-                  animation: 'glowPulse 3s infinite alternate',
                 }}
               >
                 <FaChartLine size={32} />
@@ -350,10 +293,50 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Rest of Dashboard (unchanged structure, only inline styles used) */}
-        {/* Stats Row */}
+        {/* Quick Actions */}
+        <div className="d-flex flex-wrap gap-2 mb-4">
+          <button
+            onClick={() => window.location.href = '/billing/quotations/new'}
+            className="d-flex align-items-center gap-2"
+            style={{
+              backgroundColor: orangeColor,
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E05A00'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = orangeColor}
+          >
+            <FaPlus size={14} />
+            New Quotation
+          </button>
+          <button
+            onClick={() => window.location.href = '/billing/invoices/new'}
+            className="d-flex align-items-center gap-2"
+            style={{
+              backgroundColor: 'white',
+              color: darkTextColor,
+              border: `1px solid ${borderColor}`,
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.borderColor = orangeColor}
+            onMouseLeave={(e) => e.currentTarget.style.borderColor = borderColor}
+          >
+            <FaPlus size={14} />
+            New Invoice
+          </button>
+        </div>
+
+        {/* Stats Row — Unified Orange Theme */}
         <div className="row g-4 mb-4">
-          {/* Total Customers */}
           <div className="col-md-4">
             <div
               className="card h-100 border-0 shadow-sm"
@@ -361,10 +344,10 @@ const Dashboard = () => {
             >
               <div className="card-body d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="display-6 fw-bold" style={{ color: orangeColor }}>
+                  <div className="display-6 fw-bold" style={{ color: orangeColor, lineHeight: 1 }}>
                     {todayOverview.totalCustomers}
                   </div>
-                  <div className="fw-medium" style={{ color: darkTextColor }}>
+                  <div className="fw-bold" style={{ color: darkTextColor, fontSize: '0.95rem' }}>
                     Total Customers
                   </div>
                   <div className="small" style={{ color: grayTextColor }}>
@@ -386,7 +369,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Quotations This Month */}
           <div className="col-md-4">
             <div
               className="card h-100 border-0 shadow-sm"
@@ -394,10 +376,10 @@ const Dashboard = () => {
             >
               <div className="card-body d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="display-6 fw-bold" style={{ color: '#10B981' }}>
+                  <div className="display-6 fw-bold" style={{ color: orangeColor, lineHeight: 1 }}>
                     {todayOverview.quotationsThisMonth}
                   </div>
-                  <div className="fw-medium" style={{ color: darkTextColor }}>
+                  <div className="fw-bold" style={{ color: darkTextColor, fontSize: '0.95rem' }}>
                     Quotations This Month
                   </div>
                   <div className="small" style={{ color: grayTextColor }}>
@@ -409,8 +391,8 @@ const Dashboard = () => {
                   style={{
                     width: '56px',
                     height: '56px',
-                    backgroundColor: '#10B98110',
-                    color: '#10B981',
+                    backgroundColor: `${orangeColor}10`,
+                    color: orangeColor,
                   }}
                 >
                   <FaFileAlt size={24} />
@@ -419,7 +401,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Total Invoices */}
           <div className="col-md-4">
             <div
               className="card h-100 border-0 shadow-sm"
@@ -427,10 +408,10 @@ const Dashboard = () => {
             >
               <div className="card-body d-flex justify-content-between align-items-center">
                 <div>
-                  <div className="display-6 fw-bold" style={{ color: '#8B5CF6' }}>
+                  <div className="display-6 fw-bold" style={{ color: orangeColor, lineHeight: 1 }}>
                     {todayOverview.totalInvoices}
                   </div>
-                  <div className="fw-medium" style={{ color: darkTextColor }}>
+                  <div className="fw-bold" style={{ color: darkTextColor, fontSize: '0.95rem' }}>
                     Total Invoices
                   </div>
                   <div className="small" style={{ color: grayTextColor }}>
@@ -442,8 +423,8 @@ const Dashboard = () => {
                   style={{
                     width: '56px',
                     height: '56px',
-                    backgroundColor: '#8B5CF610',
-                    color: '#8B5CF6',
+                    backgroundColor: `${orangeColor}10`,
+                    color: orangeColor,
                   }}
                 >
                   <FaFileAlt size={24} />
@@ -476,22 +457,22 @@ const Dashboard = () => {
             </a>
           </div>
           <div className="card-body">
-            <div className="row g-3 mb-3">
-              <div className="col-md-3">
+            <div className="row g-3 mb-4">
+              <div className="col-md-4">
                 <div className="d-flex align-items-center">
                   <div
                     className="rounded-circle d-flex align-items-center justify-content-center me-3"
                     style={{
                       width: '40px',
                       height: '40px',
-                      backgroundColor: '#10B98110',
-                      color: '#10B981',
+                      backgroundColor: `${orangeColor}10`,
+                      color: orangeColor,
                     }}
                   >
-                    <FaFileAlt size={16} />
+                    <FaMoneyBillWave size={16} />
                   </div>
                   <div>
-                    <div className="fw-bold" style={{ color: darkTextColor }}>
+                    <div className="fw-bold" style={{ color: darkTextColor, fontSize: '1.1rem' }}>
                       ₹{salesSummary.revenueThisMonth}
                     </div>
                     <div className="small" style={{ color: grayTextColor }}>
@@ -500,7 +481,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-3">
+              <div className="col-md-4">
                 <div className="d-flex align-items-center">
                   <div
                     className="rounded-circle d-flex align-items-center justify-content-center me-3"
@@ -514,7 +495,7 @@ const Dashboard = () => {
                     <FaTimes size={16} />
                   </div>
                   <div>
-                    <div className="fw-bold" style={{ color: darkTextColor }}>
+                    <div className="fw-bold" style={{ color: darkTextColor, fontSize: '1.1rem' }}>
                       ₹{salesSummary.outstandingInvoices}
                     </div>
                     <div className="small" style={{ color: grayTextColor }}>
@@ -523,7 +504,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-3">
+              <div className="col-md-4">
                 <div className="d-flex align-items-center">
                   <div
                     className="rounded-circle d-flex align-items-center justify-content-center me-3"
@@ -537,8 +518,8 @@ const Dashboard = () => {
                     <FaClock size={16} />
                   </div>
                   <div>
-                    <div className="fw-bold" style={{ color: darkTextColor }}>
-                      {salesSummary.avgPaymentDays}
+                    <div className="fw-bold" style={{ color: darkTextColor, fontSize: '1.1rem' }}>
+                      {salesSummary.avgPaymentDays} days
                     </div>
                     <div className="small" style={{ color: grayTextColor }}>
                       Avg. Payment Days
@@ -546,36 +527,16 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-md-3">
-                <div className="d-flex align-items-center">
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center me-3"
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      backgroundColor: '#8B5CF610',
-                      color: '#8B5CF6',
-                    }}
-                  >
-                    <FaUsers size={16} />
-                  </div>
-                  <div>
-                    <div className="fw-bold" style={{ color: darkTextColor }}>
-                      Top Customers
-                    </div>
-                    <div className="small" style={{ color: grayTextColor }}>
-                      By Revenue
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
+
             <div>
-              <h6 className="fw-medium mb-1" style={{ color: darkTextColor }}>
+              <h6 className="fw-bold mb-2" style={{ color: darkTextColor }}>
                 Top 3 Customers
               </h6>
               <p className="small" style={{ color: grayTextColor }}>
-                No customer data available
+                <a href="/customers/new" style={{ color: orangeColor, textDecoration: 'underline' }}>
+                  Add your first customer
+                </a> to see insights here.
               </p>
             </div>
           </div>
@@ -598,8 +559,20 @@ const Dashboard = () => {
                 </p>
               </div>
               <div className="card-body">
+                {/* Progress Bar */}
+                <div className="mb-4" style={{ height: '8px', backgroundColor: '#E5E7EB', borderRadius: '4px' }}>
+                  <div
+                    style={{
+                      width: `${progressPercent}%`,
+                      height: '100%',
+                      backgroundColor: orangeColor,
+                      borderRadius: '4px',
+                    }}
+                  ></div>
+                </div>
+
                 <div className="d-flex flex-column gap-4">
-                  {setupProgress.map((item) => (
+                  {setupProgress.map((item) =>(
                     <div key={item.id} className="d-flex align-items-start gap-3">
                       <div
                         className="rounded-circle d-flex align-items-center justify-content-center"
@@ -611,27 +584,15 @@ const Dashboard = () => {
                           border: item.completed ? `2px solid ${orangeColor}` : `1px solid ${borderColor}`,
                         }}
                       >
-                        {item.completed ? <FaCheck size={12} /> : <span className="small">{item.id}</span>}
+                        {item.completed ? <FaCheck size={12} /> : <span className="small fw-bold">{item.id}</span>}
                       </div>
                       <div>
-                        <div className="fw-medium mb-1" style={{ color: darkTextColor }}>
+                        <div className="fw-bold mb-1" style={{ color: darkTextColor, fontSize: '0.95rem' }}>
                           {item.title}
                         </div>
                         <div className="small" style={{ color: grayTextColor }}>
                           {item.description}
                         </div>
-                        {item.completed && (
-                          <div className="mt-2" style={{ height: '4px', backgroundColor: '#E5E7EB', borderRadius: '2px' }}>
-                            <div
-                              className="h-100"
-                              style={{
-                                width: '100%',
-                                backgroundColor: orangeColor,
-                                borderRadius: '2px',
-                              }}
-                            ></div>
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -657,26 +618,26 @@ const Dashboard = () => {
               <div className="card-body">
                 <div className="d-flex flex-column gap-3 mb-4">
                   <div className="d-flex justify-content-between">
-                    <span className="small" style={{ color: grayTextColor }}>
+                    <span className="small fw-medium" style={{ color: grayTextColor }}>
                       Business ID
                     </span>
-                    <span className="fw-medium" style={{ color: darkTextColor }}>
+                    <span className="fw-bold" style={{ color: darkTextColor }}>
                       {businessDetails.businessId}
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
-                    <span className="small" style={{ color: grayTextColor }}>
+                    <span className="small fw-medium" style={{ color: grayTextColor }}>
                       Plan
                     </span>
-                    <span className="fw-medium" style={{ color: darkTextColor }}>
+                    <span className="fw-bold" style={{ color: darkTextColor }}>
                       {businessDetails.plan}
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">
-                    <span className="small" style={{ color: grayTextColor }}>
+                    <span className="small fw-medium" style={{ color: grayTextColor }}>
                       Owner
                     </span>
-                    <span className="fw-medium" style={{ color: darkTextColor }}>
+                    <span className="fw-bold" style={{ color: darkTextColor }}>
                       {businessDetails.owner}
                     </span>
                   </div>
@@ -687,13 +648,13 @@ const Dashboard = () => {
                   style={{ backgroundColor: `${orangeColor}08`, border: `1px solid ${orangeColor}20` }}
                 >
                   <div className="d-flex align-items-start">
-                    <FaChartLine className="me-2 mt-1" style={{ color: orangeColor }} />
+                    <FaIndustry className="me-2 mt-1" style={{ color: orangeColor }} />
                     <div>
-                      <div className="fw-medium" style={{ color: darkTextColor }}>
+                      <div className="fw-bold" style={{ color: darkTextColor }}>
                         Upgrade Available
                       </div>
                       <div className="small" style={{ color: grayTextColor }}>
-                        Unlock manufacturing features
+                        Unlock manufacturing features: machine tracking, material cost analysis
                       </div>
                     </div>
                   </div>
@@ -715,16 +676,16 @@ const Dashboard = () => {
                 Built for Makers, Not Offices
               </h3>
             </div>
-            <p className="small mb-3" style={{ color: grayTextColor }}>
+            <p className="small mb-3" style={{ color: grayTextColor, lineHeight: 1.5 }}>
               Track every job, machine hour, and material gram. No more guessing where your costs go.
             </p>
             <div className="d-flex flex-wrap gap-2">
               <span
                 className="badge py-2 px-3"
                 style={{
-                  backgroundColor: '#10B98115',
-                  color: '#10B981',
-                  fontWeight: '500',
+                  backgroundColor: `${orangeColor}10`,
+                  color: orangeColor,
+                  fontWeight: '600',
                   borderRadius: '6px',
                 }}
               >
@@ -735,7 +696,7 @@ const Dashboard = () => {
                 style={{
                   backgroundColor: '#F59E0B15',
                   color: '#D97706',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   borderRadius: '6px',
                 }}
               >
@@ -746,7 +707,7 @@ const Dashboard = () => {
                 style={{
                   backgroundColor: '#3B82F615',
                   color: '#2563EB',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   borderRadius: '6px',
                 }}
               >

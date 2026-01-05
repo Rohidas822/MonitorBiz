@@ -5,8 +5,10 @@ import { Link, useLocation } from "react-router-dom";
 const Sidebar = () => {
   const [openSalesBilling, setOpenSalesBilling] = useState(false);
   const [openManagement, setOpenManagement] = useState(false);
+  const [openAccounts, setOpenAccounts] = useState(false);
   const [salesBillingHeight, setSalesBillingHeight] = useState(0);
   const [managementHeight, setManagementHeight] = useState(0);
+  const [accountsHeight, setAccountsHeight] = useState(0);
   const location = useLocation();
 
   // Auto-expand sections based on active route
@@ -15,15 +17,19 @@ const Sidebar = () => {
       setOpenSalesBilling(true);
     } else if (location.pathname.startsWith("/dashboard/management")) {
       setOpenManagement(true);
+    } else if (location.pathname.startsWith("/dashboard/accounts")) {
+      setOpenAccounts(true);
     } else {
       setOpenSalesBilling(false);
       setOpenManagement(false);
+      setOpenAccounts(false);
     }
   }, [location.pathname]);
 
   const measureHeights = useCallback(() => {
-    setSalesBillingHeight(230); // Adjusted for visual spacing
-    setManagementHeight(230);
+    setSalesBillingHeight(180); // Adjusted for visual spacing
+    setManagementHeight(280);
+    setAccountsHeight(150);
   }, []);
 
   useEffect(() => {
@@ -99,7 +105,7 @@ const Sidebar = () => {
     <aside
       style={{
         width: "260px",
-        backgroundColor: "#0F0F0F", // Near black
+        backgroundColor: "#000000ff", // Near black
         height: "100vh",
         position: "fixed",
         padding: "24px 16px",
@@ -244,7 +250,6 @@ const Sidebar = () => {
                 { to: "billing/commodity", label: "Commodity" },
                 { to: "billing/quote", label: "Quotations" },
                 { to: "billing/invoice", label: "Invoices" },
-                { to: "billing/expenses", label: "Expenses" },
               ].map((item) => (
                 <Link
                   key={item.to}
@@ -294,6 +299,7 @@ const Sidebar = () => {
               overflow: "hidden",
               transition: "height 0.3s ease, opacity 0.2s ease",
               marginTop: openManagement ? "8px" : "0",
+              
             }}
           >
             <div
@@ -306,11 +312,76 @@ const Sidebar = () => {
             >
               {[
                 { to: "/dashboard/management/team", label: "Team" },
-                { to: "/dashboard/management/business-profile", label: "Business Profile" },
+                { to: "/dashboard/management/business", label: "Business Profile" },
                 { to: "/dashboard/management/reports", label: "Reports" },
                 { to: "/dashboard/management/activity-log", label: "Activity Log" },
                 { to: "/dashboard/management/aging-report", label: "Aging Report" },
                 { to: "/dashboard/management/performance", label: "Performance" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  style={getLinkStyle(item.to)}
+                  className="icon-hover"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+
+        {/* Accounts Section */}
+        <div>
+          <button
+            onClick={() => setOpenAccounts(!openAccounts)}
+            style={sectionButtonStyle(openAccounts)}
+            aria-expanded={openAccounts}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                className="icon-hover"
+                style={{ fontSize: "18px", color: openAccounts ? "#FF6B00" : "#A1A1AA" }}
+              >
+                ⚙️
+              </span>
+              <span>Accounts</span>
+            </div>
+            <span
+              className="rotate"
+              style={{
+                transform: openAccounts ? "rotate(180deg)" : "rotate(0deg)",
+                color: "#FF6B00",
+                transition: "transform 0.25s ease",
+              }}
+            >
+              ▼
+            </span>
+          </button>
+
+          <div
+            style={{
+              height: openAccounts ? `${accountsHeight}px` : "0px",
+              opacity: openAccounts ? 1 : 0,
+              overflow: "hidden",
+              transition: "height 0.3s ease, opacity 0.2s ease",
+              marginTop: openAccounts ? "8px" : "0",
+              
+            }}
+          >
+            <div
+              style={{
+                paddingLeft: "28px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
+              {[
+                { to: "/dashboard/accounts/expenses", label: "Expenses" },
+                { to: "/dashboard/accounts/payment-receipts", label: "Payment Receipts" },
+                { to: "/dashboard/accounts/record-payment", label: "Record Payment" },
               ].map((item) => (
                 <Link
                   key={item.to}

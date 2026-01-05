@@ -1,5 +1,5 @@
 // src/components/dashboard/Billing/EditCommodity.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   FaBox,
@@ -10,43 +10,134 @@ import {
 const EditCommodity = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  // Mock data — replace with API fetch
-  const initialData = {
-    commodityName: 'Consulting Hour',
-    type: 'Service',
+  const [formData, setFormData] = useState({
+    commodityName: '',
+    type: 'Good (Physical Product)',
     hsnCode: '',
-    sku: 'CONS-HR-001',
+    sku: '',
     barcode: '',
-    productType: 'Service',
-    unit: 'Hour',
-    unitPrice: '100.00',
+    productType: 'Product',
+    unit: 'Kilogram (kg)',
+    unitPrice: '',
     gstRate: '18',
-    category: 'Professional Services',
-    description: 'One hour of expert business consulting, including process analysis and recommendations.',
-  };
+    category: '',
+    description: '',
+    status: 'Active',
+    supplier: '',
+    stock: '',
+    reorderPoint: '',
+  });
 
-  const [formData, setFormData] = React.useState(initialData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const orangeColor = '#FF6F00';
   const darkTextColor = '#111827';
   const borderColor = '#D1D5DB';
   const backgroundColor = '#F9FAFB';
 
+  // Fetch commodity data
+  useEffect(() => {
+    const fetchCommodity = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(`http://localhost:3000/commodities/${id}`);
+        
+        if (!response.ok) {
+          throw new Error('Commodity not found');
+        }
+        
+        const commodityData = await response.json();
+        
+        // Map the commodity data to form state
+        setFormData({
+          commodityName: commodityData.commodityName || commodityData.name || '',
+          type: commodityData.type || 'Good (Physical Product)',
+          hsnCode: commodityData.hsnCode || '',
+          sku: commodityData.sku || '',
+          barcode: commodityData.barcode || '',
+          productType: commodityData.productType || 'Product',
+          unit: commodityData.unit || 'Kilogram (kg)',
+          unitPrice: commodityData.unitPrice || '',
+          gstRate: commodityData.gstRate || '18',
+          category: commodityData.category || '',
+          description: commodityData.description || '',
+          status: commodityData.status || 'Active',
+          supplier: commodityData.supplier || '',
+          stock: commodityData.stock || '',
+          reorderPoint: commodityData.reorderPoint || '',
+        });
+      } catch (err) {
+        console.error('Error fetching commodity:', err);
+        setError('Failed to load commodity data. Please check if the commodity exists.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCommodity();
+    }
+  }, [id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Updated Data:', formData);
-    alert('Commodity updated successfully!');
-    navigate('/dashboard/billing/commodity');
+    
+    // Basic validation
+    if (!formData.commodityName || !formData.unit || !formData.unitPrice) {
+      setError('Please fill in all required fields (Commodity Name, Unit, and Unit Price)');
+      return;
+    }
+
+    try {
+      setError(null);
+      
+      // Prepare updated commodity data
+      const updatedData = {
+        ...formData,
+        id: parseInt(id), // Ensure ID is number
+        unitPrice: parseFloat(formData.unitPrice),
+        gstRate: parseFloat(formData.gstRate) || 0,
+        // Keep existing createdAt if it exists
+      };
+
+      const response = await fetch(`http://localhost:3000/commodities/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update commodity');
+      }
+
+      const updatedCommodity = await response.json();
+      console.log('Commodity updated:', updatedCommodity);
+      setSuccess(true);
+      
+      // Redirect after brief delay
+      setTimeout(() => {
+        navigate('/dashboard/billing/commodity');
+      }, 1000);
+    } catch (err) {
+      console.error('Error updating commodity:', err);
+      setError('Failed to update commodity. Please try again.');
+    }
   };
 
   const handleCancel = () => {
-    navigate('/dashboard/billing/commodity/view/' + id);
+    navigate(`/dashboard/billing/commodity/view/${id}`);
   };
 
   const inputStyle = (isFocused = false) => ({
@@ -59,6 +150,105 @@ const EditCommodity = () => {
     backgroundColor: '#FFFFFF',
     transition: 'border-color 0.2s',
   });
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: '24px',
+          backgroundColor: backgroundColor,
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontFamily: '"Inter", sans-serif',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: '3px solid #FF6F00',
+              borderTopColor: 'transparent',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 16px',
+            }}
+          ></div>
+          <p style={{ color: '#6B7280' }}>Loading commodity details...</p>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          padding: '24px',
+          backgroundColor: backgroundColor,
+          minHeight: '100vh',
+          fontFamily: '"Inter", sans-serif',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            padding: '48px 32px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: '#FEF2F2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px',
+            }}
+          >
+            <div style={{ color: '#EF4444', fontSize: '28px' }}>!</div>
+          </div>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 12px', color: '#000000' }}>
+            Error Loading Commodity
+          </h3>
+          <p style={{ fontSize: '15px', color: '#6B7280', margin: '0 0 28px' }}>
+            {error}
+          </p>
+          <button
+            onClick={() => navigate('/dashboard/billing/commodity')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              backgroundColor: orangeColor,
+              color: '#FFFFFF',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+          >
+            <FaArrowLeft size={14} />
+            Back to Commodities
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -124,7 +314,7 @@ const EditCommodity = () => {
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '12px',
-          boxShadow: '0 2 p 10px rgba(0,0,0,0.05)',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
           overflow: 'hidden',
         }}
       >
@@ -139,6 +329,38 @@ const EditCommodity = () => {
           </h2>
         </div>
         <div style={{ padding: '28px' }}>
+          {error && (
+            <div
+              style={{
+                backgroundColor: "#FEF2F2",
+                border: "1px solid #FECACA",
+                color: "#DC2626",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div
+              style={{
+                backgroundColor: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                color: "#059669",
+                padding: "12px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+                fontSize: "14px",
+              }}
+            >
+              Commodity updated successfully! Redirecting...
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px', alignItems: 'start' }}>
               {/* Left */}

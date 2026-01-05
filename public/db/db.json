@@ -1,0 +1,145 @@
+{
+  "customers": [
+    {
+      "name": "Rohidas Raghu Lakade",
+      "phone": "7350764010",
+      "email": "rohidaslakade0707@gmail.com",
+      "contactPerson": "Sandesh Patil",
+      "address": "Balaji Nagar, Katraj, Pune",
+      "state": "Maharashtra",
+      "city": "Pune",
+      "pincode": "413201",
+      "gst": "RTUB4578LPOT7654",
+      "paymentTerms": "Net 15",
+      "billingAddress": "Balaji nagar, Pune",
+      "shippingAddress": "Bandra, Mumbai",
+      "customerType": "business",
+      "id": "1767334262080"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "c088",
+      "workOrder": "1",
+      "invoiceDate": "2026-01-05",
+      "customerName": "Sandesh Patil",
+      "customerEmail": "sandesh1234@gmail.com",
+      "customerPhone": "8888181820",
+      "customerGstin": "RTUB4578LPOT7654",
+      "customerAddress": "Vetawade, kolhapur, Maharashtra, India ",
+      "dueDate": "2026-01-14",
+      "items": [
+        {
+          "id": 1,
+          "description": "cleaned successfully",
+          "qty": "2",
+          "unitPrice": "845",
+          "taxRate": 18,
+          "total": 1994.2
+        }
+      ],
+      "subtotal": 1690,
+      "taxTotal": 304.2,
+      "grandTotal": 1894.2,
+      "createdAt": "2026-01-05T06:07:12.452Z",
+      "lastEditedAt": "2026-01-05T07:26:04.976Z",
+      "editedBy": "Rohidas Raghu Lakade",
+      "editReason": "Date is increased.",
+      "paidAmount": 1000,
+      "payments": [
+        {
+          "amount": 1000,
+          "date": "2026-01-05",
+          "method": "UPI",
+          "reference": "ooppllkk022fd",
+          "notes": "payment added successfully"
+        }
+      ]
+    }
+  ],
+  "commodities": [
+    {
+      "id": "1767433456861",
+      "commodityName": "Home Cleaning",
+      "type": "Service",
+      "hsnCode": "074",
+      "sku": "SRVHOMEC20683",
+      "barcode": "5581499006276",
+      "productType": "Service",
+      "unit": "m",
+      "unitPrice": 750,
+      "gstRate": 18,
+      "category": "Cleaning Service",
+      "description": "Home cleaning (14*15)",
+      "createdAt": "2026-01-03T09:44:16.861Z"
+    },
+    {
+      "id": "1767433833801",
+      "commodityName": "Chair",
+      "type": "Good (Physical Product)",
+      "hsnCode": "021",
+      "sku": "PRDCHAIR43972",
+      "barcode": "1392057248036",
+      "productType": "Bundle",
+      "unit": "dozen",
+      "unitPrice": 2499.99,
+      "gstRate": 18,
+      "category": "Plastics",
+      "description": "1 dozen chairs must be required!!!!!!!!!!!!!!!!!!!!!!!",
+      "status": "Active",
+      "supplier": "Primary Supplier",
+      "stock": "out of stock",
+      "reorderPoint": ""
+    }
+  ],
+  "quotations": [
+    {
+      "id": "1767436187462",
+      "customerId": "2",
+      "validUntil": "2026-02-01",
+      "notes": "Create quotations",
+      "items": [
+        {
+          "id": 1767436066803,
+          "commodity": "Training Session",
+          "description": "no any",
+          "qty": 9,
+          "unit": "Hour",
+          "unitPrice": 500,
+          "discount": 10,
+          "taxRate": 18
+        }
+      ],
+      "totals": {
+        "subtotal": "4050.00",
+        "tax": "729.00",
+        "total": "4779.00"
+      },
+      "createdAt": "2026-01-03T10:29:47.462Z",
+      "status": "Converted"
+    }
+  ],
+  "expenses": [
+    {
+      "date": "2026-01-05",
+      "amount": 800,
+      "payee": "Rohidas Lakade",
+      "category": "Marketing",
+      "paymentMethod": "Credit Card",
+      "reference": "txtav000774120zk",
+      "billableToCustomer": true,
+      "id": "1552"
+    },
+    {
+      "id": "4e76",
+      "date": "2026-02-21",
+      "amount": 1025,
+      "payee": "Rohidas Lakade",
+      "category": "Office Supplies",
+      "paymentMethod": "Bank Transfer",
+      "reference": "AFTRVF0934WT02",
+      "billableToCustomer": true,
+      "createdAt": "2026-01-05T11:57:00.707Z"
+    }
+  ]
+}

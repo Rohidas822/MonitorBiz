@@ -1,5 +1,5 @@
-// Commodity.jsx
-import React from "react";
+// src/components/dashboard/Billing/Commodity.jsx
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
@@ -16,45 +16,198 @@ import {
 
 const Commodity = () => {
   const navigate = useNavigate();
-
-  // Mock data
-  const commodities = [
-    {
-      id: 1,
-      name: "Consulting Hour",
-      type: "Service",
-      supplier: "Primary Supplier",
-      stock: "N/A",
-      reorderPoint: "50 hour",
-      unitCost: "₹100.00",
-      status: "Active",
-    },
-  ];
-
-  const stats = [
-    {
-      title: "Total Commodities",
-      value: 1,
-      icon: <FaBox color="#FF6F00" size={20} />,
-    },
-    {
-      title: "Active Commodities",
-      value: 1,
-      icon: <FaCheck color="#FF6F00" size={20} />,
-    },
-    {
-      title: "Low Stock",
-      value: 0,
-      icon: <FaExclamationTriangle color="#FF6F00" size={20} />,
-    },
-    { title: "Vendors", value: 0, icon: <FaTruck color="#FF6F00" size={20} /> },
-  ];
+  const [commodities, setCommodities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const orangeColor = "#FF6F00";
   const darkTextColor = "#111827";
   const lightGray = "#F3F4F6";
   const borderColor = "#E5E7EB";
   const backgroundColor = "#F9FAFB";
+
+  // Fetch commodities from JSON Server
+  useEffect(() => {
+    const fetchCommodities = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('http://localhost:3000/commodities');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch commodities');
+        }
+        
+        const data = await response.json();
+        setCommodities(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching commodities:', err);
+        setError('Failed to load commodities. Please check if JSON Server is running on port 3000.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommodities();
+  }, []);
+
+  // Calculate stats
+  const totalCommodities = commodities.length;
+  const activeCommodities = commodities.filter(c => c.status !== 'Inactive').length;
+  const lowStock = commodities.filter(c => {
+    // For services, stock is "N/A", so skip them
+    if (c.type === 'Service' || c.stock === 'N/A') return false;
+    const stockValue = parseFloat(c.stock);
+    const reorderPointValue = parseFloat(c.reorderPoint);
+    return !isNaN(stockValue) && !isNaN(reorderPointValue) && stockValue <= reorderPointValue;
+  }).length;
+  const vendors = new Set(commodities.map(c => c.supplier).filter(supplier => supplier)).size;
+
+  // Handle delete commodity
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/commodities/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete commodity');
+      }
+
+      // Remove from local state
+      setCommodities(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      console.error('Error deleting commodity:', err);
+      alert('Failed to delete commodity. Please try again.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: "24px",
+          backgroundColor: backgroundColor,
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: '"Inter", sans-serif',
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              border: "3px solid #FF6F00",
+              borderTopColor: "transparent",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto 16px",
+            }}
+          ></div>
+          <p style={{ color: "#6B7280" }}>Loading commodities...</p>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          padding: "24px",
+          backgroundColor: backgroundColor,
+          minHeight: "100vh",
+          fontFamily: '"Inter", sans-serif',
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderRadius: "12px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            padding: "48px 32px",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
+              backgroundColor: "#FEF2F2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 24px",
+            }}
+          >
+            <div style={{ color: "#EF4444", fontSize: "28px" }}>!</div>
+          </div>
+          <h3 style={{ fontSize: "20px", fontWeight: "700", margin: "0 0 12px", color: "#000000" }}>
+            Error Loading Commodities
+          </h3>
+          <p style={{ fontSize: "15px", color: "#6B7280", margin: "0 0 28px" }}>
+            {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              backgroundColor: orangeColor,
+              color: "#FFFFFF",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            <FaPlus size={14} />
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const stats = [
+    {
+      title: "Total Commodities",
+      value: totalCommodities,
+      icon: <FaBox color="#3B82F6" size={20} />,
+    },
+    {
+      title: "Active Commodities",
+      value: activeCommodities,
+      icon: <FaCheck color="#10B981" size={20} />,
+    },
+    {
+      title: "Low Stock",
+      value: lowStock,
+      icon: <FaExclamationTriangle color="#F59E0B" size={20} />,
+    },
+    { 
+      title: "Vendors", 
+      value: vendors, 
+      icon: <FaTruck color="#8B5CF6" size={20} /> 
+    },
+  ];
 
   return (
     <div
@@ -160,20 +313,23 @@ const Commodity = () => {
             key={index}
             style={{
               backgroundColor: "#FFFFFF",
-              borderRadius: "10px",
+              borderRadius: "8px",
               padding: "16px",
               display: "flex",
               alignItems: "center",
               boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              borderLeft: `4px solid ${orangeColor}`,
+              border: `1px solid ${borderColor}`,
+              transition: "box-shadow 0.2s",
             }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)"}
           >
             <div
               style={{
                 width: "40px",
                 height: "40px",
-                borderRadius: "50%",
-                backgroundColor: `${orangeColor}10`,
+                borderRadius: "8px",
+                backgroundColor: `${stat.icon.props.color}10`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -211,7 +367,7 @@ const Commodity = () => {
       <div
         style={{
           backgroundColor: "#FFFFFF",
-          borderRadius: "12px",
+          borderRadius: "8px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
           overflow: "hidden",
         }}
@@ -271,217 +427,275 @@ const Commodity = () => {
           </button>
         </div>
 
-        {/* Table */}
-        <div style={{ overflowX: "auto" }}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "14px",
-            }}
-          >
-            <thead>
-              <tr style={{ backgroundColor: "#F9FAFB", textAlign: "left" }}>
-                {[
-                  "COMMODITY",
-                  "SUPPLIER",
-                  "STOCK",
-                  "REORDER POINT",
-                  "UNIT COST",
-                  "STATUS",
-                  "ACTIONS",
-                ].map((header, idx) => (
-                  <th
-                    key={header}
-                    style={{
-                      padding:
-                        idx === 0
-                          ? "12px 24px"
-                          : idx === 6
-                          ? "12px 24px"
-                          : "12px 16px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      color: "#6B7280",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {header}
-                    {header === "REORDER POINT" && (
-                      <span
-                        style={{
-                          marginLeft: "4px",
-                          fontSize: "0.75em",
-                          color: "#9CA3AF",
-                        }}
-                      >
-                        (?)
-                      </span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {commodities.map((item) => (
-                <tr
-                  key={item.id}
-                  style={{
-                    borderBottom: `1px solid ${borderColor}`,
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#FCFCFD")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#FFFFFF")
-                  }
-                >
-                  <td style={{ padding: "16px 24px" }}>
-                    <div
+        {/* Empty State */}
+        {commodities.length === 0 ? (
+          <div style={{ padding: "48px 32px", textAlign: "center" }}>
+            <div
+              style={{
+                width: "60px",
+                height: "60px",
+                borderRadius: "50%",
+                backgroundColor: `${orangeColor}10`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 24px",
+              }}
+            >
+              <FaBox size={28} color={orangeColor} />
+            </div>
+            <h3 style={{ fontSize: "20px", fontWeight: "700", margin: "0 0 12px", color: "#000000" }}>
+              No Commodities Yet
+            </h3>
+            <p style={{ fontSize: "15px", color: "#6B7280", margin: "0 0 28px" }}>
+              Start by creating your first commodity to manage inventory and pricing.
+            </p>
+            <button
+              onClick={() => navigate("/dashboard/billing/commodity/new")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                backgroundColor: orangeColor,
+                color: "#FFFFFF",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              <FaPlus size={14} />
+              Create Commodity
+            </button>
+          </div>
+        ) : (
+          /* Table */
+          <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "14px",
+              }}
+            >
+              <thead>
+                <tr style={{ backgroundColor: "#F9FAFB", textAlign: "left" }}>
+                  {[
+                    "COMMODITY",
+                    "SUPPLIER",
+                    "STOCK",
+                    "REORDER POINT",
+                    "UNIT COST",
+                    "STATUS",
+                    "ACTIONS",
+                  ].map((header, idx) => (
+                    <th
+                      key={header}
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
+                        padding:
+                          idx === 0
+                            ? "12px 24px"
+                            : idx === 6
+                            ? "12px 24px"
+                            : "12px 16px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        color: "#6B7280",
+                        textTransform: "uppercase",
+                        borderBottom: `2px solid ${borderColor}`,
                       }}
                     >
-                      <span style={{ fontWeight: "600", color: "#000000" }}>
-                        {item.name}
-                      </span>
+                      {header}
+                      {header === "REORDER POINT" && (
+                        <span
+                          style={{
+                            marginLeft: "4px",
+                            fontSize: "0.75em",
+                            color: "#9CA3AF",
+                          }}
+                        >
+                          (?)
+                        </span>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {commodities.map((item) => (
+                  <tr
+                    key={item.id}
+                    style={{
+                      borderBottom: `1px solid ${borderColor}`,
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#FCFCFD")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#FFFFFF")
+                    }
+                  >
+                    <td style={{ padding: "16px 24px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                        }}
+                      >
+                        <span style={{ fontWeight: "600", color: "#000000" }}>
+                          {item.commodityName || item.name}
+                        </span>
+                        <span
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "16px",
+                            backgroundColor: "#E1F5FE",
+                            color: "#01579B",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {item.type}
+                        </span>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#6B7280",
+                            marginTop: "4px",
+                          }}
+                        >
+                          SKU: {item.sku || "N/A"}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: "16px 16px", color: "#4B5563" }}>
+                      {item.supplier || "N/A"}
+                    </td>
+                    <td style={{ padding: "16px 16px" }}>
                       <span
                         style={{
                           padding: "4px 10px",
                           borderRadius: "16px",
-                          backgroundColor: "#E1F5FE",
-                          color: "#01579B",
+                          backgroundColor: item.stock === "0" || (item.stock && parseFloat(item.stock) === 0) ? "#FEF2F2" : "#E1F5FE",
+                          color: item.stock === "0" || (item.stock && parseFloat(item.stock) === 0) ? "#DC2626" : "#01579B",
                           fontSize: "12px",
                           fontWeight: "600",
                         }}
                       >
-                        {item.type}
+                        {item.stock || "N/A"} {item.unit || ""}
                       </span>
-                    </div>
-                  </td>
-                  <td style={{ padding: "16px 16px", color: "#4B5563" }}>
-                    {item.supplier}
-                  </td>
-                  <td style={{ padding: "16px 16px" }}>
-                    <span
+                      {item.stock === "0" || (item.stock && parseFloat(item.stock) === 0) && (
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#DC2626",
+                            marginTop: "4px",
+                          }}
+                        >
+                          Out of Stock
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: "16px 16px", color: "#4B5563" }}>
+                      {item.reorderPoint || "N/A"} {item.unit || ""}
+                    </td>
+                    <td
                       style={{
-                        padding: "4px 10px",
-                        borderRadius: "16px",
-                        backgroundColor: "#E1F5FE",
-                        color: "#01579B",
-                        fontSize: "12px",
+                        padding: "16px 16px",
+                        color: "#4B5563",
                         fontWeight: "600",
                       }}
                     >
-                      {item.stock}
-                    </span>
-                  </td>
-                  <td style={{ padding: "16px 16px", color: "#4B5563" }}>
-                    {item.reorderPoint}
-                  </td>
-                  <td
-                    style={{
-                      padding: "16px 16px",
-                      color: "#4B5563",
-                      fontWeight: "600",
-                    }}
-                  >
-                    {item.unitCost}
-                  </td>
-                  <td style={{ padding: "16px 16px" }}>
-                    <span
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: "16px",
-                        backgroundColor: "#ECFDF5",
-                        color: "#059669",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: "16px 24px" }}>
-                    <div style={{ display: "flex", gap: "12px" }}>
-                      {/* View */}
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/dashboard/billing/commodity/view/${item.id}`
-                          )
-                        }
+                      {typeof item.unitPrice === 'number' 
+                        ? `₹${item.unitPrice.toFixed(2)}` 
+                        : item.unitCost || 'N/A'}
+                    </td>
+                    <td style={{ padding: "16px 16px" }}>
+                      <span
                         style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#3B82F6",
-                          fontSize: "16px",
-                          padding: "4px",
-                          borderRadius: "4px",
+                          padding: "4px 10px",
+                          borderRadius: "16px",
+                          backgroundColor: item.status === 'Active' ? "#ECFDF5" : "#FEF2F2",
+                          color: item.status === 'Active' ? "#059669" : "#DC2626",
+                          fontSize: "12px",
+                          fontWeight: "600",
                         }}
-                        aria-label="View commodity"
                       >
-                        <FaEye />
-                      </button>
-
-                      {/* Edit */}
-                      <button
-                        onClick={() =>
-                          navigate(
-                            `/dashboard/billing/commodity/edit/${item.id}`
-                          )
-                        }
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#F59E0B",
-                          fontSize: "16px",
-                          padding: "4px",
-                          borderRadius: "4px",
-                        }}
-                        aria-label="Edit commodity"
-                      >
-                        <FaEdit />
-                      </button>
-
-                      {/* Delete (optional: add confirmation) */}
-                      <button
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              "Are you sure you want to delete this commodity?"
+                        {item.status || 'Active'}
+                      </span>
+                    </td>
+                    <td style={{ padding: "16px 24px" }}>
+                      <div style={{ display: "flex", gap: "12px" }}>
+                        {/* View */}
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/dashboard/billing/commodity/view/${item.id}`
                             )
-                          ) {
-                            // TODO: Call delete API here
-                            alert("Commodity deleted!");
-                            // Optionally refresh list or navigate
                           }
-                        }}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#EF4444",
-                          fontSize: "16px",
-                          padding: "4px",
-                          borderRadius: "4px",
-                        }}
-                        aria-label="Delete commodity"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "#3B82F6",
+                            fontSize: "16px",
+                            padding: "4px",
+                            borderRadius: "4px",
+                          }}
+                          aria-label="View commodity"
+                        >
+                          <FaEye />
+                        </button>
+
+                        {/* Edit */}
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/dashboard/billing/commodity/edit/${item.id}`
+                            )
+                          }
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "#F59E0B",
+                            fontSize: "16px",
+                            padding: "4px",
+                            borderRadius: "4px",
+                          }}
+                          aria-label="Edit commodity"
+                        >
+                          <FaEdit />
+                        </button>
+
+                        {/* Delete */}
+                        <button
+                          onClick={() => handleDelete(item.id, item.commodityName || item.name)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "#EF4444",
+                            fontSize: "16px",
+                            padding: "4px",
+                            borderRadius: "4px",
+                          }}
+                          aria-label="Delete commodity"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

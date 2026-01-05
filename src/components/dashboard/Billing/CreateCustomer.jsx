@@ -1,10 +1,6 @@
 // src/components/dashboard/Billing/CreateCustomer.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-// import { toast } from "react-toastify";
-
-const API = "/api/v1/customers"; // Replace with your actual API
 
 const CreateCustomer = () => {
   const navigate = useNavigate();
@@ -38,14 +34,36 @@ const CreateCustomer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Create customer object with customerType
+    const customerData = {
+      ...formData,
+      customerType,
+      id: Date.now(), // Simple ID generation (use UUID in production)
+      createdAt: new Date().toISOString()
+    };
+
     try {
-      // await axios.post(API, { ...formData, customerType });
-      // toast.success("Customer created successfully!");
-      alert("Customer created successfully!"); // Replace with real toast later
+      const response = await fetch('http://localhost:3000/customers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customerData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create customer');
+      }
+
+      const createdCustomer = await response.json();
+      console.log('Customer created:', createdCustomer);
+      
+      alert("Customer created successfully!");
       navigate("/dashboard/billing/customer");
     } catch (err) {
-      console.error(err);
-      alert("Failed to create customer"); // Replace with real toast
+      console.error('Error creating customer:', err);
+      alert("Failed to create customer. Please try again.");
     }
   };
 

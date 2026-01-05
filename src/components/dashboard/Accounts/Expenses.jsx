@@ -1,21 +1,22 @@
-// src/components/dashboard/Billing/Invoice.jsx
+// src/components/dashboard/Billing/Expenses.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaSearch,
   FaUserCircle,
-  FaFileAlt,
+  FaMoneyBillWave,
   FaPlus,
   FaCheck,
   FaClock,
   FaChartLine,
+  FaWallet,
+  FaFileAlt,
   FaEye,
   FaEdit,
-  FaDownload,
+  FaTrash,
 } from 'react-icons/fa';
-import { nav } from 'framer-motion/client';
 
-const Invoice = () => {
+const Expenses = () => {
   const navigate = useNavigate();
 
   // Colors
@@ -23,93 +24,109 @@ const Invoice = () => {
   const darkTextColor = '#111827';
   const borderColor = '#E5E7EB';
   const backgroundColor = '#F9FAFB';
-  const lightGreenBg = '#ECFDF5';
-  const lightYellowBg = '#FEF3C7';
-  const lightRedBg = '#FFF0F0';
-  const lightBlueBg = '#DBEAFE';
+  const lightGrayBg = '#F9FAFB';
 
   // State
-  const [invoices, setInvoices] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filterStatus, setFilterStatus] = useState('All Status');
-  const [sortOrder, setSortOrder] = useState('Latest first');
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [sortOrder, setSortOrder] = useState('Latest first');
 
-  // Fetch invoices
+  // Fetch expenses
   useEffect(() => {
-    const fetchInvoices = async () => {
+    const fetchExpenses = async () => {
       try {
-        const response = await fetch('http://localhost:3000/invoices');
-        if (!response.ok) throw new Error('Failed to fetch invoices');
+        const response = await fetch('http://localhost:3000/expenses');
+        if (!response.ok) throw new Error('Failed to fetch expenses');
         const data = await response.json();
-        setInvoices(Array.isArray(data) ? data : []);
+        setExpenses(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error('Error fetching invoices:', err);
-        setError('Failed to load invoices. Please ensure JSON Server is running.');
+        console.error('Error fetching expenses:', err);
+        setError('Failed to load expenses. Please ensure JSON Server is running.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInvoices();
+    fetchExpenses();
   }, []);
 
   // Derive stats
-  const totalInvoices = invoices.length;
-  const paidInvoices = invoices.filter(inv => inv.status === 'Paid').length;
-  const pendingInvoices = invoices.filter(inv => inv.status !== 'Paid').length;
-  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.grandTotal || inv.total || 0), 0);
+  const totalExpenses = expenses.length;
+  const totalSpent = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+
+  // Get unique categories
+  const categories = [...new Set(expenses.map(exp => exp.category).filter(Boolean))];
 
   // Filter & sort logic
-  const filteredInvoices = invoices
-    .filter(inv => {
+  const filteredExpenses = expenses
+    .filter(exp => {
       const matchesSearch =
-        inv.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        inv.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        inv.customerEmail?.toLowerCase().includes(searchQuery.toLowerCase());
+        exp.payee?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        exp.reference?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        exp.category?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesStatus = filterStatus === 'All Status' || inv.status === filterStatus;
-      return matchesSearch && matchesStatus;
+      const matchesCategory = filterCategory === 'All' || exp.category === filterCategory;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.invoiceDate || a.createdAt);
-      const dateB = new Date(b.invoiceDate || b.createdAt);
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
       return sortOrder === 'Latest first' ? dateB - dateA : dateA - dateB;
     });
 
   // Responsive helper
   const isMobile = window.innerWidth < 768;
 
-  const handleCreateInvoice = () => {
-    navigate('/dashboard/billing/invoice/new');
+  // Format date
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? '—' : date.toLocaleDateString('en-GB');
   };
 
-  const handleViewInvoice = (id) => {
-    navigate(`/dashboard/billing/invoice/${id}`);
+  // Handle view expense
+  const handleViewExpense = (id) => {
+    navigate(`/dashboard/accounts/expenses/${id}`);
   };
 
-  const handleEditInvoice = (id) => {
-    navigate(`/dashboard/billing/invoice/${id}/edit`);
+  // Handle edit expense
+  const handleEditExpense = (id) => {
+    navigate(`/dashboard/accounts/expenses/${id}/edit`);
   };
 
-  const handleDownloadPDF = (id) => {
-    alert(`PDF download for invoice ${id} will be implemented soon.`);
+  // Handle delete expense
+  const handleDeleteExpense = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this expense?')) return;
+
+    try {
+      await fetch(`http://localhost:3000/expenses/${id}`, {
+        method: 'DELETE',
+      });
+      setExpenses(expenses.filter(exp => exp.id !== id));
+      alert('Expense deleted successfully!');
+    } catch (err) {
+      console.error('Error deleting expense:', err);
+      alert('Failed to delete expense.');
+    }
   };
 
   if (loading) {
     return (
       <div
         style={{
+          padding: isMobile ? '16px' : '24px',
+          backgroundColor: backgroundColor,
+          minHeight: '100vh',
+          fontFamily: '"Inter", sans-serif',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100vh',
-          backgroundColor: backgroundColor,
-          fontFamily: '"Inter", sans-serif',
         }}
       >
-        <div style={{ fontSize: '18px', color: darkTextColor }}>Loading invoices...</div>
+        <div style={{ fontSize: '18px', color: darkTextColor }}>Loading expenses...</div>
       </div>
     );
   }
@@ -176,10 +193,9 @@ const Invoice = () => {
         }}
       >
         <h1 style={{ fontSize: isMobile ? '20px' : '24px', fontWeight: '700', margin: 0, color: '#000000' }}>
-          Invoices
+          Expenses
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          {/* Search */}
           <div style={{ position: 'relative', width: isMobile ? '100%' : '220px' }}>
             <FaSearch
               style={{
@@ -193,7 +209,7 @@ const Invoice = () => {
             />
             <input
               type="text"
-              placeholder="Search invoices..."
+              placeholder="Search expenses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
@@ -211,7 +227,6 @@ const Invoice = () => {
             />
           </div>
 
-          {/* User Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
             <FaUserCircle size={20} color="#4B5563" />
             <span>Rohidas Raghu Lakade</span>
@@ -231,7 +246,7 @@ const Invoice = () => {
         </div>
       </div>
 
-      {/* Main Card */}
+      {/* Expenses Header Card */}
       <div
         style={{
           backgroundColor: '#FFFFFF',
@@ -246,14 +261,13 @@ const Invoice = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '16px',
             flexWrap: isMobile ? 'wrap' : 'nowrap',
-            gap: '16px',
+            gap: '24px',
           }}
         >
           <div>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 4px 0', color: '#000000' }}>
-              Invoices
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 8px 0', color: '#000000' }}>
+              Expenses
             </h2>
             <div
               style={{
@@ -268,10 +282,10 @@ const Invoice = () => {
               <FaFileAlt size={12} />
               <span>Home</span>
               <span> / </span>
-              <span style={{ color: '#4B5563' }}>Invoices</span>
+              <span style={{ color: '#4B5563' }}>Expenses</span>
             </div>
             <p style={{ fontSize: '14px', color: '#6B7280', margin: 0 }}>
-              Track billing, payments, and customer invoices
+              Track and manage your business expenses
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -297,17 +311,17 @@ const Invoice = () => {
                   backgroundColor: orangeColor,
                 }}
               ></span>
-              {totalInvoices} Total
+              {totalExpenses} Total
             </div>
             <button
-              onClick={handleCreateInvoice}
+              onClick={() => navigate('/dashboard/accounts/expenses/new')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 padding: '8px 16px',
                 borderRadius: '8px',
-                backgroundColor: '#6F42C1',
+                backgroundColor: orangeColor,
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '14px',
@@ -316,7 +330,7 @@ const Invoice = () => {
               }}
             >
               <FaPlus size={14} />
-              New Invoice
+              New Expense
             </button>
           </div>
         </div>
@@ -331,55 +345,110 @@ const Invoice = () => {
           marginBottom: '24px',
         }}
       >
-        {[
-          { title: 'Total Invoices', value: totalInvoices, icon: <FaFileAlt size={20} color="#495057" />, color: '#495057', bg: '#49505720' },
-          { title: 'Paid Invoices', value: paidInvoices, icon: <FaCheck size={20} color="#28a745" />, color: '#28a745', bg: '#28a74520' },
-          { title: 'Pending Payment', value: pendingInvoices, icon: <FaClock size={20} color="#ffc107" />, color: '#ffc107', bg: '#ffc10720' },
-          { title: 'Total Revenue', value: `₹${totalRevenue.toFixed(2)}`, icon: <FaChartLine size={20} color="#6f42c1" />, color: '#6f42c1', bg: '#6f42c120' },
-        ].map((stat, i) => (
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '10px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            borderLeft: `4px solid #495057`,
+          }}
+        >
           <div
-            key={i}
             style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '10px',
-              padding: '16px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#49505720',
               display: 'flex',
               alignItems: 'center',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-              borderLeft: `4px solid ${stat.color}`,
+              justifyContent: 'center',
+              marginRight: '12px',
             }}
           >
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: stat.bg,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: '12px',
-              }}
-            >
-              {stat.icon}
-            </div>
-            <div>
-              <p style={{ fontSize: '12px', color: '#6B7280', margin: '0 0 4px 0' }}>{stat.title}</p>
-              <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 4px 0', color: '#000000' }}>
-                {stat.value}
-              </h3>
-              <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>
-                {stat.title === 'Total Invoices' && 'All time'}
-                {stat.title === 'Paid Invoices' && 'Completed'}
-                {stat.title === 'Pending Payment' && 'Awaiting payment'}
-                {stat.title === 'Total Revenue' && 'Invoice value'}
-              </p>
-            </div>
+            <FaMoneyBillWave size={20} color="#495057" />
           </div>
-        ))}
+          <div>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: '0 0 4px 0' }}>Total Expenses</p>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 4px 0', color: '#000000' }}>
+              {totalExpenses}
+            </h3>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>All time</p>
+          </div>
+        </div>
+
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '10px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            borderLeft: `4px solid #28a745`,
+          }}
+        >
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#28a74520',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '12px',
+            }}
+          >
+            <FaCheck size={20} color="#28a745" />
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: '0 0 4px 0' }}>Paid Expenses</p>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 4px 0', color: '#000000' }}>
+              {totalExpenses} {/* In real app, filter by status */}
+            </h3>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>Completed</p>
+          </div>
+        </div>
+
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '10px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            borderLeft: `4px solid #6f42c1`,
+          }}
+        >
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#6f42c120',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '12px',
+            }}
+          >
+            <FaChartLine size={20} color="#6f42c1" />
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: '0 0 4px 0' }}>Total Spent</p>
+            <h3 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 4px 0', color: '#000000' }}>
+              ₹{totalSpent.toFixed(2)}
+            </h3>
+            <p style={{ fontSize: '12px', color: '#6B7280', margin: 0 }}>Expense value</p>
+          </div>
+        </div>
       </div>
 
-      {/* Invoices Table */}
+      {/* Expenses Table */}
       <div
         style={{
           backgroundColor: '#FFFFFF',
@@ -399,13 +468,13 @@ const Invoice = () => {
           }}
         >
           <h3 style={{ fontSize: '18px', fontWeight: '700', margin: 0, color: '#000000' }}>
-            Recent Invoices
+            Recent Expenses
           </h3>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <label style={{ fontSize: '14px', color: '#6B7280' }}>Filter:</label>
+            <label style={{ fontSize: '14px', color: '#6B7280' }}>Category:</label>
             <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
               style={{
                 padding: '6px 12px',
                 borderRadius: '6px',
@@ -415,11 +484,10 @@ const Invoice = () => {
                 backgroundColor: '#FFFFFF',
               }}
             >
-              <option value="All Status">All Status</option>
-              <option value="Draft">Draft</option>
-              <option value="Paid">Paid</option>
-              <option value="Overdue">Overdue</option>
-              <option value="Partial Payment">Partial Payment</option>
+              <option value="All">All</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <svg
@@ -454,16 +522,64 @@ const Invoice = () => {
           </div>
         </div>
 
-        {filteredInvoices.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px', fontSize: '16px', color: '#6B7280' }}>
-            No invoices found.
+        {filteredExpenses.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              padding: '48px 32px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                backgroundColor: `${orangeColor}10`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+              }}
+            >
+              <FaWallet size={28} color={orangeColor} />
+            </div>
+            <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 12px', color: '#000000' }}>
+              No Expenses Found
+            </h3>
+            <p style={{ fontSize: '15px', color: '#6B7280', maxWidth: '500px', margin: '0 auto 28px' }}>
+              {searchQuery || filterCategory !== 'All'
+                ? 'No expenses match your current filters.'
+                : 'Start tracking your business expenses by creating your first expense entry.'}
+            </p>
+            <button
+              onClick={() => navigate('/dashboard/accounts/expenses/new')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                backgroundColor: orangeColor,
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}
+            >
+              <FaPlus size={14} />
+              Create Expense
+            </button>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: isMobile ? '12px' : '14px' }}>
               <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', textAlign: 'left' }}>
-                  {['INVOICE', 'CUSTOMER', 'DATE', 'DUE DATE', 'AMOUNT', 'STATUS', 'ACTIONS'].map((header) => (
+                <tr style={{ backgroundColor: lightGrayBg, textAlign: 'left' }}>
+                  {['DATE', 'PAYEE', 'CATEGORY', 'AMOUNT', 'METHOD', 'REFERENCE', 'ACTIONS'].map((header) => (
                     <th
                       key={header}
                       style={{
@@ -481,9 +597,9 @@ const Invoice = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredInvoices.map((inv) => (
+                {filteredExpenses.map((exp) => (
                   <tr
-                    key={inv.id}
+                    key={exp.id}
                     style={{
                       borderBottom: `1px solid ${borderColor}`,
                       transition: 'background-color 0.2s',
@@ -492,98 +608,34 @@ const Invoice = () => {
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
                   >
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '6px',
-                            backgroundColor: lightBlueBg,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <FaFileAlt size={14} color="#3B82F6" />
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: '600', fontSize: isMobile ? '12px' : '14px' }}>{inv.id || inv.invoiceId || 'INV-000'}</div>
-                          {inv.fromQuotation && (
-                            <div style={{ fontSize: '10px', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="10"
-                                height="10"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#6B7280"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M21 12a9 9 0 00-9-9H9l3 3 3-3 3 3-3 3 3 3-3 3 3 3-3 3-3-3-3 3-3-3 3-3-3-3 3-3z" />
-                              </svg>
-                              From quotation
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      <div>{formatDate(exp.date)}</div>
                     </td>
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <div>
-                        <div style={{ fontWeight: '600', fontSize: isMobile ? '12px' : '14px' }}>
-                          {inv.customerName || '—'}
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#6B7280' }}>{inv.customerEmail || '—'}</div>
-                      </div>
+                      <div>{exp.payee || '—'}</div>
                     </td>
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <div>{new Date(inv.invoiceDate || inv.createdAt).toLocaleDateString('en-GB')}</div>
-                    </td>
-                    <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <div>{inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-GB') : '—'}</div>
+                      <div>{exp.category || '—'}</div>
                     </td>
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top', textAlign: 'right' }}>
-                      <div style={{ fontWeight: '600' }}>₹{(inv.grandTotal || inv.total || 0).toFixed(2)}</div>
-                      <div style={{ fontSize: '11px', color: '#6B7280' }}>
-                        {inv.items?.length || 1} item{inv.items?.length !== 1 ? 's' : ''}
-                      </div>
+                      <div style={{ fontWeight: '600', color: darkTextColor }}>₹{exp.amount?.toFixed(2) || '0.00'}</div>
                     </td>
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <span
-                        style={{
-                          padding: '4px 8px',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          backgroundColor:
-                            inv.status === 'Paid'
-                              ? lightGreenBg
-                              : inv.status === 'Overdue'
-                              ? lightRedBg
-                              : lightYellowBg,
-                          color:
-                            inv.status === 'Paid'
-                              ? '#166534'
-                              : inv.status === 'Overdue'
-                              ? '#DC2626'
-                              : '#B45309',
-                        }}
-                      >
-                        {inv.status || 'Draft'}
-                      </span>
+                      <div>{exp.paymentMethod || '—'}</div>
                     </td>
                     <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
-                      <div style={{ display: 'flex', gap: isMobile ? '4px' : '8px', flexWrap: 'wrap' }}>
+                      <div>{exp.reference || '—'}</div>
+                    </td>
+                    <td style={{ padding: isMobile ? '8px' : '12px', verticalAlign: 'top' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button
-                          onClick={() => navigate(`/dashboard/billing/invoice/view/${inv.id}`)}
+                          onClick={() => navigate(`/dashboard/accounts/expenses/view/${exp.id}`)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
                             padding: '4px 8px',
                             borderRadius: '6px',
-                            backgroundColor: lightBlueBg,
+                            backgroundColor: '#DBEAFE',
                             color: '#2563EB',
                             border: 'none',
                             fontSize: '11px',
@@ -595,14 +647,14 @@ const Invoice = () => {
                           View
                         </button>
                         <button
-                          onClick={() => navigate(`/dashboard/billing/invoice/edit/${inv.id}`)}
+                          onClick={() => navigate(`/dashboard/accounts/expenses/edit/${exp.id}`)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
                             padding: '4px 8px',
                             borderRadius: '6px',
-                            backgroundColor: lightYellowBg,
+                            backgroundColor: '#FEF3C7',
                             color: '#B45309',
                             border: 'none',
                             fontSize: '11px',
@@ -614,23 +666,23 @@ const Invoice = () => {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDownloadPDF(inv.id)}
+                          onClick={() => handleDeleteExpense(exp.id)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
                             padding: '4px 8px',
                             borderRadius: '6px',
-                            backgroundColor: '#D1FAE5',
-                            color: '#059669',
+                            backgroundColor: '#FEE2E2',
+                            color: '#DC2626',
                             border: 'none',
                             fontSize: '11px',
                             fontWeight: '600',
                             cursor: 'pointer',
                           }}
                         >
-                          <FaDownload size={10} />
-                          PDF
+                          <FaTrash size={10} />
+                          Delete
                         </button>
                       </div>
                     </td>
@@ -645,4 +697,4 @@ const Invoice = () => {
   );
 };
 
-export default Invoice;
+export default Expenses;
